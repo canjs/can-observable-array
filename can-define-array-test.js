@@ -27,6 +27,20 @@ QUnit.module("can-define-array", function(hooks) {
 		assert.equal(calls, expected, "Got all of the values I expected");
 	});
 
+	QUnit.test(".filter can be provided an object", function(assert) {
+		class Todos extends DefineArray {}
+
+		let todos = new Todos(...[
+			{ name: "walk the dog" },
+			{ name: "cook dinner", completed: true }
+		]);
+
+		let completed = todos.filter({ completed: true });
+		assert.equal(completed.length, 1, "only one");
+		assert.equal(completed[0].name, "cook dinner");
+		assert.ok(completed instanceof Todos, "Filtered item is of right type");
+	});
+
 	QUnit.module("ExtendedDefineArray.items");
 
 	QUnit.test("calling new with items", function(assert) {
