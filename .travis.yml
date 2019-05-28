@@ -8,7 +8,7 @@ before_script:
 addons:
   firefox: latest
   sauce_connect: true
-script: npm run ci
+script: npm test
 deploy:
   provider: npm
   email: core@donejs.com
