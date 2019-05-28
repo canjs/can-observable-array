@@ -2,12 +2,8 @@ language: node_js
 node_js: node
 services:
   - xvfb
-before_script:
-- npm run http-server &
-- sleep 2
 addons:
   firefox: latest
-  sauce_connect: true
 script: npm test
 deploy:
   provider: npm
