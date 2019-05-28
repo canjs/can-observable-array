@@ -1,26 +1,90 @@
 const canReflect = require("can-reflect");
 const DefineArray = require("./src/can-define-array");
+const DefineObject = require("can-define-object");
 const QUnit = require("steal-qunit");
 
-QUnit.test("mixinProxyArray adds proxyability to arrays", function(assert) {
-	class Todos extends DefineArray {}
+QUnit.module("can-define-array", function(hooks) {
+	QUnit.test("Adds proxyability to arrays", function(assert) {
+		class Todos extends DefineArray {}
 
-	let todos = new Todos();
-	let calls = 0;
-	let expected = 2;
+		let todos = new Todos();
+		let calls = 0;
+		let expected = 2;
 
-	canReflect.onKeyValue(todos, 0, newValue => {
-		calls++;
-		assert.equal(newValue, "get this working", "able to listen to push");
+		canReflect.onKeyValue(todos, 0, newValue => {
+			calls++;
+			assert.equal(newValue, "get this working", "able to listen to push");
+		});
+
+		canReflect.onKeyValue(todos, 14, newValue => {
+			calls++;
+			assert.equal(newValue, "some value", "able to listen to property setter");
+		});
+
+		todos.push("get this working");
+		todos[14] = "some value";
+
+		assert.equal(calls, expected, "Got all of the values I expected");
 	});
 
-	canReflect.onKeyValue(todos, 14, newValue => {
-		calls++;
-		assert.equal(newValue, "some value", "able to listen to property setter");
+	QUnit.module("ExtendedDefineArray.items");
+
+	QUnit.test("calling new with items", function(assert) {
+		class Todo extends DefineObject {};
+		class TodoList extends DefineArray {
+			static get items() {
+				return Todo;
+			}
+		}
+
+		let todos = new TodoList([{ label: "Walk the dog" }]);
+		let firstTodo = todos[0];
+
+		assert.ok(firstTodo instanceof Todo, "Item worked");
 	});
 
-	todos.push("get this working");
-	todos[14] = "some value";
+	QUnit.test(".splice", function(assert) {
+		class Todo extends DefineObject {};
+		class TodoList extends DefineArray {
+			static get items() {
+				return Todo;
+			}
+		}
 
-	assert.equal(calls, expected, "Got all of the values I expected");
+		let todos = new TodoList();
+		todos.splice(0, 0, { label: "Walk the dog" });
+		let firstTodo = todos[0];
+
+		assert.ok(firstTodo instanceof Todo, "Item worked");
+	});
+
+	QUnit.test(".push", function(assert) {
+		class Todo extends DefineObject {};
+		class TodoList extends DefineArray {
+			static get items() {
+				return Todo;
+			}
+		}
+
+		let todos = new TodoList();
+		todos.push({ label: "Walk the dog" });
+		let firstTodo = todos[0];
+
+		assert.ok(firstTodo instanceof Todo, "Item worked");
+	});
+
+	QUnit.test(".unshift", function(assert) {
+		class Todo extends DefineObject {};
+		class TodoList extends DefineArray {
+			static get items() {
+				return Todo;
+			}
+		}
+
+		let todos = new TodoList();
+		todos.unshift({ label: "Walk the dog" });
+		let firstTodo = todos[0];
+
+		assert.ok(firstTodo instanceof Todo, "Item worked");
+	});
 });
