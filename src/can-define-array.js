@@ -31,6 +31,10 @@ class DefineArray extends ProxyArray {
 		mixins.initialize(this, {});
 	}
 
+	static get [Symbol.species]() {
+		return this;
+	}
+
 	splice(index, howMany, ...items) {
 		convertItems(this.constructor, items);
 		super.splice(index, howMany, ...items);
@@ -44,6 +48,22 @@ class DefineArray extends ProxyArray {
 	unshift(...items) {
 		convertItems(this.constructor, items);
 		super.unshift(...items);
+	}
+
+	filter(callback) {
+		if(typeof callback === "object") {
+			let props = callback;
+			callback = function(item) {
+				for (let prop in props) {
+					if (item[prop] !== props[prop]) {
+						return false;
+					}
+				}
+				return true;
+			};
+		}
+
+		return super.filter(callback);
 	}
 }
 
