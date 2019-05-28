@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/canjs/can-define-array#readme",
   "devDependencies": {
+    "can-define-object": "^0.1.0",
     "steal": "^2.2.1",
     "steal-qunit": "^2.0.0",
     "testee": "^0.9.1"
