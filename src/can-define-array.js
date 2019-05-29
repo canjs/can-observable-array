@@ -71,6 +71,10 @@ class DefineArray extends MixedInArray {
 
 		return super.filter(callback);
 	}
+
+	forEach(...args) {
+		return Array.prototype.forEach.apply(this, args);
+	}
 }
 
 makeDefineInstanceKey(DefineArray);
