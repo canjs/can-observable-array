@@ -71,7 +71,7 @@ const mutateMethods = {
 			type: "splice"
 		}];
 	},
-	"reverse": function(arr, args, old) {
+	"reverse": function(arr) {
 		// The array replaced everything.
 		return [{
 			index: 0,
@@ -88,7 +88,7 @@ const mutateMethods = {
 canReflect.eachKey(mutateMethods, function(makePatches, prop){
 	var protoFn = Array.prototype[prop];
 	var mutateMethod = function() {
-		var meta = this[symbols.metaSymbol],
+		var meta = this[metaSymbol],
 			// Capture if this function should be making sideEffects
 			makeSideEffects = meta.preventSideEffects === 0,
 			oldLength = meta.target.length;
@@ -267,7 +267,7 @@ const proxyHandlers = {
 
 		return deleteSuccessful;
 	},
-	ownKeys(target) {
+	ownKeys() {
 		ObservationRecorder.add(this.proxy, "can.keys");
 
 		return Object.getOwnPropertyNames(this.target)

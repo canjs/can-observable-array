@@ -1,5 +1,7 @@
 const canReflect = require("can-reflect");
+const mapBindings = require("can-event-queue/map/map");
 
+var canMeta = Symbol.for("can.meta");
 const computedPropertyDefinitionSymbol = Symbol.for("can.computedPropertyDefinitions");
 const onKeyValueSymbol = Symbol.for("can.onKeyValue");
 const offKeyValueSymbol = Symbol.for("can.offKeyValue");
@@ -82,11 +84,11 @@ const computedHelpers = {
 		let offKeyValue = proxyKeys[offKeyValueSymbol];
 
 		canReflect.assignSymbols(proxyKeys, {
-			"can.onKeyValue": function(key, handler, queue) {
+			"can.onKeyValue": function(key) {
 				computedHelpers.bind(this, key);
 				return onKeyValue.apply(this, arguments);
 			},
-			"can.offKeyValue": function(key, handler, queue) {
+			"can.offKeyValue": function(key) {
 				computedHelpers.unbind(this, key);
 				return offKeyValue.apply(this, arguments);
 			},

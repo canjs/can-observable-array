@@ -1,4 +1,3 @@
-const canReflect = require("can-reflect");
 const DefineArray = require("../src/can-define-array");
 const DefineObject = require("can-define-object");
 const QUnit = require("steal-qunit");
@@ -7,7 +6,7 @@ module.exports = function() {
 	QUnit.module("ExtendedDefineArray.items");
 
 	QUnit.test("calling new with items", function(assert) {
-		class Todo extends DefineObject {};
+		class Todo extends DefineObject {}
 		class TodoList extends DefineArray {
 			static get items() {
 				return Todo;
@@ -21,7 +20,7 @@ module.exports = function() {
 	});
 
 	QUnit.test(".splice", function(assert) {
-		class Todo extends DefineObject {};
+		class Todo extends DefineObject {}
 		class TodoList extends DefineArray {
 			static get items() {
 				return Todo;
@@ -36,7 +35,7 @@ module.exports = function() {
 	});
 
 	QUnit.test(".push", function(assert) {
-		class Todo extends DefineObject {};
+		class Todo extends DefineObject {}
 		class TodoList extends DefineArray {
 			static get items() {
 				return Todo;
@@ -51,7 +50,7 @@ module.exports = function() {
 	});
 
 	QUnit.test(".unshift", function(assert) {
-		class Todo extends DefineObject {};
+		class Todo extends DefineObject {}
 		class TodoList extends DefineArray {
 			static get items() {
 				return Todo;

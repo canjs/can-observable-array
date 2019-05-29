@@ -1,6 +1,5 @@
 const canReflect = require("can-reflect");
 const DefineArray = require("../src/can-define-array");
-const DefineObject = require("can-define-object");
 const QUnit = require("steal-qunit");
 
 module.exports = function() {
@@ -69,5 +68,31 @@ module.exports = function() {
 		});
 
 		assert.equal(actual, expected, "Looped over each item");
-	})
+	});
+
+	QUnit.test("splice dispatches patches and length events", function(assert) {
+		class Todos extends DefineArray {}
+
+		let todos = new Todos(
+			{ name: "walk the dog" },
+			{ name: "cook dinner", completed: true }
+		);
+
+		let expected = 2, actual = 0;
+
+		canReflect.onPatches(todos, patches => {
+			if(patches[0].type === "splice") {
+				assert.ok(true, "splice patches called");
+				actual++;
+			}
+		});
+
+		canReflect.onKeyValue(todos, "length", () => {
+			actual++;
+		});
+
+		todos.splice(0, 1);
+
+		assert.equal(actual, expected, "Length and patches called");
+	});
 };
