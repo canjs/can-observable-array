@@ -10,6 +10,11 @@ const ObservationRecorder = require("can-observation-recorder");
 const ProxyArray = require("./proxy-array")();
 const queues = require("can-queues");
 
+// symbols aren't enumerable ... we'd need a version of Object that treats them that way
+const localOnPatchesSymbol = "can.patches";
+const onKeyValueSymbol = Symbol.for("can.onKeyValue");
+const offKeyValueSymbol = Symbol.for("can.offKeyValue");
+
 function convertItems(Constructor, items) {
 	if(items.length) {
 		if(Constructor.items) {
@@ -169,6 +174,19 @@ class DefineArray extends MixedInArray {
 
 		queues.batch.stop();
 		return removed;
+	}
+
+	/* Symbols */
+	[Symbol.for("can.splice")](index, deleteCount, insert){
+		return this.splice(...[index, deleteCount].concat(insert));
+	}
+
+	[Symbol.for("can.onPatches")](handler, queue){
+		this[onKeyValueSymbol](localOnPatchesSymbol, handler,queue);
+	}
+
+	[Symbol.for("can.offPatches")](handler, queue) {
+		this[offKeyValueSymbol](localOnPatchesSymbol, handler, queue);
 	}
 }
 
