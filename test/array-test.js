@@ -95,4 +95,30 @@ module.exports = function() {
 
 		assert.equal(actual, expected, "Length and patches called");
 	});
+
+	QUnit.test("can.splice dispatches patches and length events", function(assert) {
+		class Todos extends DefineArray {}
+
+		let todos = new Todos(
+			{ name: "walk the dog" },
+			{ name: "cook dinner", completed: true }
+		);
+
+		let expected = 2, actual = 0;
+
+		canReflect.onPatches(todos, patches => {
+			if(patches[0].type === "splice") {
+				assert.ok(true, "splice patches called");
+				actual++;
+			}
+		});
+
+		canReflect.onKeyValue(todos, "length", () => {
+			actual++;
+		});
+
+		canReflect.splice(todos, 0, 1);
+
+		assert.equal(actual, expected, "Length and patches called");
+	});
 };
