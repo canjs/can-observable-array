@@ -41,6 +41,18 @@ QUnit.module("can-define-array", function(hooks) {
 		assert.ok(completed instanceof Todos, "Filtered item is of right type");
 	});
 
+	QUnit.test("canReflect.new creates a new array with items", function(assert) {
+		class Todos extends DefineArray {}
+
+		let todos = canReflect.new(Todos, [
+			{ name: "walk the dog" },
+			{ name: "cook dinner", completed: true }
+		]);
+
+		assert.equal(todos.length, 2, "There are 2 items");
+		assert.equal(todos[0].name, "walk the dog");
+	});
+
 	QUnit.module("ExtendedDefineArray.items");
 
 	QUnit.test("calling new with items", function(assert) {

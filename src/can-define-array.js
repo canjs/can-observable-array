@@ -22,7 +22,9 @@ function convertItems(Constructor, items) {
 	}
 }
 
-class DefineArray extends ProxyArray {
+const MixedInArray = mixinTypeEvents(mixinMapProps(ProxyArray));
+
+class DefineArray extends MixedInArray {
 	// TODO define stuff here
 	constructor(...items) {
 		convertItems(new.target, items);
@@ -33,6 +35,10 @@ class DefineArray extends ProxyArray {
 
 	static get [Symbol.species]() {
 		return this;
+	}
+
+	static [Symbol.for("can.new")](items) {
+		return new this(...items);
 	}
 
 	splice(index, howMany, ...items) {
@@ -67,7 +73,6 @@ class DefineArray extends ProxyArray {
 	}
 }
 
-DefineArray = mixinTypeEvents(mixinMapProps(DefineArray));
 makeDefineInstanceKey(DefineArray);
 
 module.exports = DefineArray;
