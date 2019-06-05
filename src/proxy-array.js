@@ -7,6 +7,7 @@ const {
 	eventDispatcher,
 	shouldRecordObservationOnAllKeysExceptFunctionsOnProto
 } = require("./helpers");
+const { mixins } = require("can-define-mixin");
 
 const hasOwn = Object.prototype.hasOwnProperty;
 const { isSymbolLike } = canReflect;
@@ -150,8 +151,16 @@ function setValueAndOnChange(key, value, target, proxy, onChange) {
 		old = target[key];
 		change = old !== value;
 		if (change) {
-			target[key] = value;
-			onChange(hadOwn, old);
+			let keyIsString = typeof key === "string";
+
+			// String keys added to the instance (and is not "length")
+			// Are newly defined properties and have propertyDefaults provided.
+			if(keyIsString && !(key in target)) {
+				mixins.expando(target, key, value);
+			} else {
+				target[key] = value;
+				onChange(hadOwn, old);
+			}
 		}
 	}
 }
