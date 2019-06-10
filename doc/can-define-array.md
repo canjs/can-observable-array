@@ -49,6 +49,8 @@
   );
   ```
 
+  @param {*} items Items to be added to the array. If [can-define-array/static.items] is defined, each item will run through the type converter.
+
   @return {can-define-array} An instance of `DefineArray` with the values from _items_.
 
 @body
@@ -94,7 +96,7 @@ canReflect.onInstancePatches( MyList, ( instance, patches ) => {
 } );
 ```
 
-## Use
+## Using
 
 The `can-define-array` package exports a `DefineArray` class.  It can be used
 with `new` to create observable lists.  For example:
