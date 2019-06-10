@@ -8,6 +8,11 @@
     "jshint": "jshint src/*.js test/*.js --config",
     "lint": "npm run jshint",
     "prepublishOnly": "npm run compile-to-es5",
+    "preversion": "npm test",
+    "version": "git commit -am \"Update version number\"",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish",
     "test": "npm run lint && npm run testee",
     "testee": "testee test.html --browsers firefox"
   },
