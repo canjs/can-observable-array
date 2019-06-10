@@ -10,42 +10,46 @@
 
 @signature `class extends DefineArray`
 
-Creates a derived class extending from `DefineArray`. Useful for creating typed lists to use with associated typed [can-define-object objects].
+  Creates a derived class extending from `DefineArray`. Useful for creating typed lists to use with associated typed [can-define-object objects].
 
-```js
-import { DefineArray, DefineObject } from "can/everything";
+  ```js
+  import { DefineArray, DefineObject } from "can/everything";
 
-class Todo extends DefineObject {
-  static define = {
-    label: String
-  };
-}
+  class Todo extends DefineObject {
+    static define = {
+      label: String
+    };
+  }
 
-class TodoList extends DefineArray {
-  static items = Todo;
-}
+  class TodoList extends DefineArray {
+    static items = Todo;
+  }
 
-let todos = new TodoList(
-  { label: "Walk the dog" },
-  { label: "Make dinner" }
-)
+  let todos = new TodoList(
+    { label: "Walk the dog" },
+    { label: "Make dinner" }
+  )
 
-console.log(todos[0] instanceof Todo); // -> true
-```
-@codepen
+  console.log(todos[0] instanceof Todo); // -> true
+  ```
+  @codepen
+
+  @return {Constructor} An extended `DefineArray` constructor with definitions from [can-define-object/object.static.define].
 
 @signature `new DefineArray(...[items])`
 
-Creates an instance of a DefineArray or an extended DefineArray with enumerated properties from `items`.
+  Creates an instance of a DefineArray or an extended DefineArray with enumerated properties from `items`.
 
-```js
-import { DefineArray } from "can/everything";
+  ```js
+  import { DefineArray } from "can/everything";
 
-const people = new DefineArray(
-	{ first: "Justin", last: "Meyer" },
-	{ first: "Paula", last: "Strozak" }
-);
-```
+  const people = new DefineArray(
+  	{ first: "Justin", last: "Meyer" },
+  	{ first: "Paula", last: "Strozak" }
+  );
+  ```
+
+  @param {*} items Items to be added to the array. If [can-define-array/static.items] is defined, each item will run through the type converter.
 
   @return {can-define-array} An instance of `DefineArray` with the values from _items_.
 
@@ -92,7 +96,7 @@ canReflect.onInstancePatches( MyList, ( instance, patches ) => {
 } );
 ```
 
-## Use
+## Using
 
 The `can-define-array` package exports a `DefineArray` class.  It can be used
 with `new` to create observable lists.  For example:
