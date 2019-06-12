@@ -188,6 +188,10 @@ class DefineArray extends MixedInArray {
 	[Symbol.for("can.offPatches")](handler, queue) {
 		this[offKeyValueSymbol](localOnPatchesSymbol, handler, queue);
 	}
+
+	get [Symbol.for("can.isListLike")]() {
+		return true;
+	}
 }
 
 makeDefineInstanceKey(DefineArray);

@@ -121,4 +121,15 @@ module.exports = function() {
 
 		assert.equal(actual, expected, "Length and patches called");
 	});
+
+	QUnit.test("isListLike", function(assert) {
+		let array = new DefineArray("one", "two");
+		assert.equal(canReflect.isListLike(array), true, "it is list like");
+
+		class Extended extends DefineArray {
+		}
+
+		let extended = new Extended("one", "two");
+		assert.equal(canReflect.isListLike(extended), true, "It is list like");
+	});
 };
