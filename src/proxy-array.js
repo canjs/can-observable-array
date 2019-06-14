@@ -185,6 +185,11 @@ const proxyHandlers = {
 	set(target, key, newValue, receiver) {
 		let proxy = proxiedObjects.get(target);
 		let startingLength = target.length;
+		let numberKey = !isSymbolLike(key) && +key;
+
+		if (Number.isInteger(numberKey)) {
+			key = numberKey;
+		}
 
 		setValueAndOnChange(key, newValue, target, proxy, function(hadOwn, oldValue) {
 			// Determine the patches this change should dispatch
@@ -194,12 +199,10 @@ const proxyHandlers = {
 				value: newValue
 			}];
 
-			let numberKey = !isSymbolLike(key) && +key;
-
 			// If we are adding an indexed value like `arr[5] =value` ...
-			if (Number.isInteger(numberKey)) {
+			if (Number.isInteger(key)) {
 				// If we set an enumerable property after the length ...
-				if (!hadOwn && numberKey > startingLength) {
+				if (!hadOwn && key > startingLength) {
 					// ... add patches for those values.
 					patches.push({
 						index: startingLength,
@@ -210,7 +213,7 @@ const proxyHandlers = {
 				} else {
 					// Otherwise, splice the value into the array.
 					patches.push.apply(patches, mutateMethods.splice(target,
-						[numberKey, 1, newValue]));
+						[key, hadOwn ? 1 : 0, newValue]));
 				}
 			}
 
@@ -241,8 +244,12 @@ const proxyHandlers = {
 			}
 			//!steal-remove-end
 
-			//mapBindings.dispatch.call( meta.proxy, dispatchArgs, [value, old]);
-			eventDispatcher(receiver, key, oldValue, newValue);
+			mapBindings.dispatch.call(receiver, dispatchArgs, [newValue, oldValue]);
+
+			if (!hadOwn) {
+				receiver.dispatch("length", [ receiver.length, receiver.length - 1 ]);
+			}
+//			eventDispatcher(receiver, key, oldValue, newValue);
 		});
 
 		return true;

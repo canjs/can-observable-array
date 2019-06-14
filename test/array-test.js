@@ -1,4 +1,5 @@
 const canReflect = require("can-reflect");
+const Observation = require("can-observation");
 const DefineArray = require("../src/can-define-array");
 const QUnit = require("steal-qunit");
 
@@ -131,6 +132,43 @@ module.exports = function() {
 
 		let extended = new Extended("one", "two");
 		assert.equal(canReflect.isListLike(extended), true, "It is list like");
+	});
+
+	QUnit.test("push dispatches patches and length events", function(assert) {
+		class Hobbies extends DefineArray {}
+		const hobbies = new Hobbies();
+
+		let expected = 2, actual = 0;
+
+		canReflect.onPatches(hobbies, patches => {
+			if(patches[0].type === "add") {
+				assert.ok(true, "add patches called");
+				actual++;
+			}
+		});
+
+		canReflect.onKeyValue(hobbies, "length", () => {
+			actual++;
+		});
+
+		hobbies.push("cooking");
+
+		assert.equal(actual, expected, "Length and patches called");
+	});
+
+	QUnit.test("push works", function(assert) {
+		class Hobbies extends DefineArray {}
+		const hobbies = new Hobbies();
+
+		const likesCooking = new Observation(() => {
+			return hobbies.includes("cooking");
+		});
+
+		likesCooking.on(() => {
+			assert.ok(true, "likes cooking");
+		});
+
+		hobbies.push("cooking");
 	});
 
 	QUnit.test("can take undefined as a value with can.new", function(assert) {
