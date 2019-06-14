@@ -1,6 +1,6 @@
 {
   "name": "can-define-array",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "description": "Observable arrays",
   "main": "dist/can-define-array.js",
   "scripts": {
