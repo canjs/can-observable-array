@@ -95,7 +95,8 @@ class DefineArray extends MixedInArray {
 	}
 
 	static [Symbol.for("can.new")](items) {
-		return new this(...items);
+		let array = items || [];
+		return new this(...array);
 	}
 
 	push(...items) {
