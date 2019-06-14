@@ -84,7 +84,12 @@ const MixedInArray = mixinTypeEvents(mixinMapProps(ProxyArray));
 class DefineArray extends MixedInArray {
 	// TODO define stuff here
 	constructor(...items) {
-		convertItems(new.target, items);
+		// Arrays can be passed a length like `new Array(15)`
+		let isLengthArg = items.length === 1 && typeof items[0] === "number";
+		if(!isLengthArg) {
+			convertItems(new.target, items);
+		}
+
 		super(...items);
 		mixins.finalizeClass(this.constructor);
 		mixins.initialize(this, {});
