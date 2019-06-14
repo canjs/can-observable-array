@@ -6,7 +6,6 @@ const {
 	mixinMapProps,
 	mixinTypeEvents
 } = require("can-define-mixin");
-const ObservationRecorder = require("can-observation-recorder");
 const ProxyArray = require("./proxy-array")();
 const queues = require("can-queues");
 
@@ -22,60 +21,6 @@ function convertItems(Constructor, items) {
 				items[i] = canReflect.convert(items[i], Constructor.items);
 			}
 		}
-	}
-}
-
-function triggerChange(attr, how, newVal, oldVal) {
-	var index = +attr;
-	// `batchTrigger` direct add and remove events...
-
-	// Make sure this is not nested and not an expando
-	if ( !isNaN(index)) {
-		var itemsDefinition = this._define.definitions["#"];
-		var patches, dispatched;
-		if (how === 'add') {
-			if (itemsDefinition && typeof itemsDefinition.added === 'function') {
-				ObservationRecorder.ignore(itemsDefinition.added).call(this, newVal, index);
-			}
-
-			patches = [{type: "splice", insert: newVal, index: index, deleteCount: 0}];
-			dispatched = {
-				type: how,
-				patches: patches
-			};
-
-			//!steal-remove-start
-			if(process.env.NODE_ENV !== 'production') {
-				dispatched.reasonLog = [ canReflect.getName(this), "added", newVal, "at", index ];
-			}
-			//!steal-remove-end
-			this.dispatch(dispatched, [ newVal, index ]);
-
-		} else if (how === 'remove') {
-			if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
-				ObservationRecorder.ignore(itemsDefinition.removed).call(this, oldVal, index);
-			}
-
-			patches = [{type: "splice", index: index, deleteCount: oldVal.length}];
-			dispatched = {
-				type: how,
-				patches: patches
-			};
-			//!steal-remove-start
-			if(process.env.NODE_ENV !== 'production') {
-				dispatched.reasonLog = [ canReflect.getName(this), "remove", oldVal, "at", index ];
-			}
-			//!steal-remove-end
-			this.dispatch(dispatched, [ oldVal, index ]);
-
-		} else {
-			this.dispatch(how, [ newVal, index ]);
-		}
-	} else {
-		this.dispatch({
-			type: "" + attr,
-			target: this
-		}, [ newVal, oldVal ]);
 	}
 }
 
@@ -164,15 +109,6 @@ class DefineArray extends MixedInArray {
 
 		queues.batch.start();
 		var removed = super.splice.apply(this, args);
-
-		if (howMany > 0) {
-			// tears down bubbling
-			triggerChange.call(this, "" + index, "remove", undefined, removed);
-		}
-		if (args.length > 2) {
-			triggerChange.call(this, "" + index, "add", added, removed);
-		}
-
 		queues.batch.stop();
 		return removed;
 	}

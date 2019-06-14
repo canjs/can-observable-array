@@ -4,8 +4,8 @@ const mapBindings = require("can-event-queue/map/map");
 const ObservationRecorder = require("can-observation-recorder");
 const {
 	assignNonEnumerable,
-	eventDispatcher,
-	shouldRecordObservationOnAllKeysExceptFunctionsOnProto
+	shouldRecordObservationOnAllKeysExceptFunctionsOnProto,
+	triggerChange
 } = require("./helpers");
 const { mixins } = require("can-define-mixin");
 
@@ -165,10 +165,6 @@ function setValueAndOnChange(key, value, target, proxy, onChange) {
 	}
 }
 
-function didLengthChangeCauseDeletions(key, value, old) {
-	return key === "length" && value < old;
-}
-
 const proxyHandlers = {
 	get(target, key, receiver) {
 		if (isSymbolLike(key)) {
@@ -184,72 +180,23 @@ const proxyHandlers = {
 
 	set(target, key, newValue, receiver) {
 		let proxy = proxiedObjects.get(target);
-		let startingLength = target.length;
 		let numberKey = !isSymbolLike(key) && +key;
 
 		if (Number.isInteger(numberKey)) {
 			key = numberKey;
 		}
 
-		setValueAndOnChange(key, newValue, target, proxy, function(hadOwn, oldValue) {
-			// Determine the patches this change should dispatch
-			let patches = [{
-				key: key,
-				type: hadOwn ? "set" : "add",
-				value: newValue
-			}];
+		setValueAndOnChange(key, newValue, target, proxy, function onChange(hadOwn, oldValue) {
 
-			// If we are adding an indexed value like `arr[5] =value` ...
 			if (Number.isInteger(key)) {
-				// If we set an enumerable property after the length ...
-				if (!hadOwn && key > startingLength) {
-					// ... add patches for those values.
-					patches.push({
-						index: startingLength,
-						deleteCount: 0,
-						insert: target.slice(startingLength),
-						type: "splice"
-					});
-				} else {
-					// Otherwise, splice the value into the array.
-					patches.push.apply(patches, mutateMethods.splice(target,
-						[key, hadOwn ? 1 : 0, newValue]));
-				}
+				triggerChange.call(
+					receiver,
+					key,
+					hadOwn ? (newValue ? "set" : "remove") : "add",
+					newValue,
+					oldValue
+				);
 			}
-
-			// In the case of deleting items by setting the length of the array,
-			// add patches that splice the items removed.
-			// (deleting individual items from an array doesn't change the length; it just creates holes)
-			if (didLengthChangeCauseDeletions(key, newValue, oldValue)) {
-				patches.push({
-					index: newValue,
-					deleteCount: oldValue - newValue,
-					insert: [],
-					type: "splice"
-				});
-			}
-			//!steal-remove-start
-			let reasonLog = [canReflect.getName(proxy)+ " set", key, "to", newValue];
-			//!steal-remove-end
-
-			let dispatchArgs = {
-				type: key,
-				patches: patches,
-				keyChanged: !hadOwn ? key : undefined
-			};
-
-			//!steal-remove-start
-			if(process.env.NODE_ENV !== 'production') {
-				dispatchArgs.reasonLog = reasonLog;
-			}
-			//!steal-remove-end
-
-			mapBindings.dispatch.call(receiver, dispatchArgs, [newValue, oldValue]);
-
-			if (!hadOwn) {
-				receiver.dispatch("length", [ receiver.length, receiver.length - 1 ]);
-			}
-//			eventDispatcher(receiver, key, oldValue, newValue);
 		});
 
 		return true;
@@ -260,25 +207,13 @@ const proxyHandlers = {
 
 		// Fire event handlers if we were able to delete and the value changed.
 		if (deleteSuccessful && this.preventSideEffects === 0 && old !== undefined) {
-			//!steal-remove-start
-			let reasonLog = [canReflect.getName(this.proxy) + " deleted", key];
-			//!steal-remove-end
-			// wrapping in process.env.NODE_ENV !== 'production' causes out of scope error
-			let dispatchArgs = {
-				type: key,
-				patches: [{
-					key: key,
-					type: "delete"
-				}],
-				keyChanged: key
-			};
-			//!steal-remove-start
-			if(process.env.NODE_ENV !== 'production') {
-				dispatchArgs.reasonLog = reasonLog;
-			}
-			//!steal-remove-end
-
-			eventDispatcher(this.proxy, dispatchArgs, [undefined, old]);
+			triggerChange.call(
+				this.proxy,
+				key,
+				"remove",
+				undefined,
+				old
+			);
 		}
 
 		return deleteSuccessful;
