@@ -1,4 +1,6 @@
 const canReflect = require("can-reflect");
+const mapBindings = require("can-event-queue/map/map");
+const ObservationRecorder = require("can-observation-recorder");
 const inSetupSymbol = Symbol.for("can.initializing");
 
 const helpers = {
@@ -28,7 +30,7 @@ const helpers = {
 				}
 				//!steal-remove-end
 
-				map.dispatch(dispatched, [newVal, current]);
+				mapBindings.dispatch.call(map, dispatched, [newVal, current]);
 			}
 		}
 	},
@@ -41,6 +43,61 @@ const helpers = {
 			(!keyInfo.protoHasKey && !Object.isSealed(meta.target)) || keyInfo.protoHasKey && (typeof targetValue !== "function"))
 		);
 	},
+	triggerChange: function(attr, how, newVal, oldVal) {
+		var index = +attr;
+		// `batchTrigger` direct add and remove events...
+
+		// Make sure this is not nested and not an expando
+		if (!isNaN(index)) {
+			var itemsDefinition = this._define.definitions["#"];
+			var patches, dispatched;
+			if (how === 'add' || how === 'set') {
+				if (itemsDefinition && typeof itemsDefinition.added === 'function') {
+					ObservationRecorder.ignore(itemsDefinition.added).call(this, newVal, index);
+				}
+
+				patches = [{type: how, insert: newVal, index: index, deleteCount: 0}];
+				dispatched = {
+					type: 'splice',
+					patches: patches
+				};
+
+				//!steal-remove-start
+				if(process.env.NODE_ENV !== 'production') {
+					dispatched.reasonLog = [ canReflect.getName(this), "added", newVal, "at", index ];
+				}
+				//!steal-remove-end
+				this.dispatch(dispatched, [ newVal, index ]);
+				this.dispatch("length", [this.length, this.length - 1]);
+				this.dispatch({ type: index }, [ newVal, oldVal ]);
+
+			} else if (how === 'remove') {
+				if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
+					ObservationRecorder.ignore(itemsDefinition.removed).call(this, oldVal, index);
+				}
+
+				patches = [{type: how, index: index, deleteCount: oldVal.length}];
+				dispatched = {
+					type: 'splice',
+					patches: patches
+				};
+				//!steal-remove-start
+				if(process.env.NODE_ENV !== 'production') {
+					dispatched.reasonLog = [ canReflect.getName(this), "remove", oldVal, "at", index ];
+				}
+				//!steal-remove-end
+				this.dispatch(dispatched, [ oldVal, index ]);
+
+			} else {
+				this.dispatch(how, [ newVal, index ]);
+			}
+		} else {
+			this.dispatch({
+				type: "" + attr,
+				target: this
+			}, [ newVal, oldVal ]);
+		}
+	}
 };
 
 module.exports = helpers;
