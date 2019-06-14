@@ -132,4 +132,9 @@ module.exports = function() {
 		let extended = new Extended("one", "two");
 		assert.equal(canReflect.isListLike(extended), true, "It is list like");
 	});
+
+	QUnit.test("can take undefined as a value with can.new", function(assert) {
+		let array = canReflect.new(DefineArray, undefined);
+		assert.deepEqual(array, [], "no values, just like with DefineList");
+	});
 };
