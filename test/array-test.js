@@ -305,6 +305,17 @@ module.exports = function() {
 				]
 			},
 			// pop
+			{
+				initialData: [ "hi", "there" ],
+				method: "pop",
+				args: [],
+				events: [
+					{ type: "length", newVal: 1, oldVal: 2 }
+				],
+				patches: [
+					[{ type: "remove", index: 1, deleteCount: 1 }]
+				]
+			},
 			// shift
 			// splice - 0, 1
 			// splice - 0, 0, [ foo, bar ]

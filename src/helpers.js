@@ -79,7 +79,7 @@ const helpers = {
 					ObservationRecorder.ignore(itemsDefinition.removed).call(this, oldVal, index);
 				}
 
-				patches = [{type: how, index: index, deleteCount: oldVal.length}];
+				patches = [{type: how, index: index, deleteCount: 1}];
 				dispatched = {
 					type: 'splice',
 					patches: patches
