@@ -272,7 +272,40 @@ module.exports = function() {
 				]
 			},
 			// unshift - 1 arg
+			{
+				initialData: [ "there" ],
+				method: "unshift",
+				args: [ "hello" ],
+				events: [
+					{ type: 1, newVal: "there", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 },
+					{ type: 0, newVal: "hello", oldVal: "there" }
+				],
+				patches: [
+					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }],
+					[{ type: "set", index: 0, deleteCount: 0, insert: "hello" }],
+				]
+			},
 			// unshift - multiple args
+			{
+				initialData: [ "you" ],
+				method: "unshift",
+				args: [ "how", "are" ],
+				events: [
+					{ type: 2, newVal: "you", oldVal: undefined },
+					{ type: "length", newVal: 3, oldVal: 2 },
+					{ type: 0, newVal: "how", oldVal: "you" },
+					{ type: 1, newVal: "are", oldVal: undefined },
+					// TODO - we're dispatching the same length event twice
+					{ type: "length", newVal: 3, oldVal: 2 }
+				],
+				patches: [
+					[{ type: "add", index: 2, deleteCount: 0, insert: "you" }],
+					// TODO - it seems like these two patches are out of order
+					[{ type: "set", index: 0, deleteCount: 0, insert: "how" }],
+					[{ type: "add", index: 1, deleteCount: 0, insert: "are" }]
+				]
+			},
 			// pop
 			// shift
 			// splice - 0, 1
