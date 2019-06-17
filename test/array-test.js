@@ -244,7 +244,6 @@ module.exports = function() {
 
 	QUnit.test("array methods dispatch the correct events", function(assert) {
 		var testSteps = [
-			// push - 1 arg
 			{
 				method: "push",
 				args: [ "hi" ],
@@ -256,7 +255,6 @@ module.exports = function() {
 					[{ type: "add", index: 0, deleteCount: 0, insert: "hi" }]
 				]
 			},
-			// push - multiple args
 			{
 				method: "push",
 				args: [ "hi", "there" ],
@@ -271,7 +269,6 @@ module.exports = function() {
 					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }]
 				]
 			},
-			// unshift - 1 arg
 			{
 				initialData: [ "there" ],
 				method: "unshift",
@@ -286,7 +283,6 @@ module.exports = function() {
 					[{ type: "set", index: 0, deleteCount: 0, insert: "hello" }],
 				]
 			},
-			// unshift - multiple args
 			{
 				initialData: [ "you" ],
 				method: "unshift",
@@ -304,7 +300,6 @@ module.exports = function() {
 					[{ type: "add", index: 1, deleteCount: 0, insert: "are" }]
 				]
 			},
-			// pop
 			{
 				initialData: [ "hi", "there" ],
 				method: "pop",
@@ -316,7 +311,6 @@ module.exports = function() {
 					[{ type: "remove", index: 1, deleteCount: 1 }]
 				]
 			},
-			// shift
 			{
 				initialData: [ "hi", "there" ],
 				method: "shift",
@@ -330,16 +324,57 @@ module.exports = function() {
 					[{ type: "remove", index: 1, deleteCount: 1 }]
 				]
 			},
-			// splice - 0, 1
-			// splice - 0, 0, [ foo, bar ]
-			// splice - 0, 1, [ foo, bar ]
+			{
+				initialData: [ "hi" ],
+				method: "splice",
+				args: [ 0, 1 ],
+				events: [
+					{ type: "length", newVal: 0, oldVal: 1 }
+				],
+				patches: [
+					[{ type: "remove", index: 0, deleteCount: 1 }]
+				]
+			},
+			{
+				initialData: [ "there" ],
+				method: "splice",
+				args: [ 0, 0, "hi" ],
+				events: [
+					{ type: 1, newVal: "there", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 },
+					{ type: 0, newVal: "hi", oldVal: "there" },
+				],
+				patches: [
+					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }],
+					[{ type: "set", index: 0, deleteCount: 0, insert: "hi" }],
+				]
+			},
+			{
+				initialData: [ "hi" ],
+				method: "splice",
+				args: [ 0, 1, "hello", "there" ],
+				events: [
+					{ type: 0, newVal: "hello", oldVal: "hi" },
+					{ type: 1, newVal: "there", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 },
+				],
+				patches: [
+					[{ type: "set", index: 0, deleteCount: 0, insert: "hello" }],
+					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }],
+				]
+			}
 		];
 
+		class Arr extends DefineArray {
+			static get items() {
+				return String;
+			}
+		}
 		testSteps.forEach((step) => {
 			// get the data for the step
 			const { method, args, events, patches, initialData = [] } = step;
 
-			const arr = new DefineArray(...initialData);
+			const arr = new Arr(...initialData);
 			const actualEvents = [], actualPatches = [];
 
 			[0, 1, 2, 3, 5, 6].forEach((index) => {
