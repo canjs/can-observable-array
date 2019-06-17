@@ -68,8 +68,11 @@ const helpers = {
 				}
 				//!steal-remove-end
 				this.dispatch(dispatched, [ newVal, index ]);
-				this.dispatch("length", [this.length, this.length - 1]);
 				this.dispatch({ type: index }, [ newVal, oldVal ]);
+
+				if (how === "add") {
+					this.dispatch("length", [this.length, this.length - 1]);
+				}
 
 			} else if (how === 'remove') {
 				if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
@@ -87,6 +90,8 @@ const helpers = {
 				}
 				//!steal-remove-end
 				this.dispatch(dispatched, [ oldVal, index ]);
+
+				this.dispatch("length", [this.length, this.length + 1]);
 
 			} else {
 				this.dispatch(how, [ newVal, index ]);

@@ -167,4 +167,78 @@ module.exports = function() {
 		let array = canReflect.new(DefineArray, undefined);
 		assert.deepEqual(array, [], "no values, just like with DefineList");
 	});
+
+	QUnit.test("setting values dispatch the correct events", function(assert) {
+		var testSteps = [
+			{
+				prop: 0,
+				value: "hi",
+				events: [
+					{ type: 0, newVal: "hi", oldVal: undefined },
+					{ type: "length", newVal: 1, oldVal: 0 }
+				],
+				patches: [
+					[{ type: "add", index: 0, deleteCount: 0, insert: "hi" }]
+				]
+			},
+			{
+				prop: 0,
+				value: "hello",
+				events: [
+					{ type: 0, newVal: "hello", oldVal: "hi" }
+				],
+				patches: [
+					[{ type: "set", index: 0, deleteCount: 0, insert: "hello" }]
+				]
+
+			},
+			{
+				prop: 1,
+				value: "there",
+				events: [
+					{ type: 1, newVal: "there", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 }
+				],
+				patches: [
+					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }]
+				]
+
+			},
+		];
+
+		const arr = new DefineArray();
+
+		let actualEvents, actualPatches;
+		canReflect.onKeyValue(arr, 0, (newVal, oldVal) => {
+			actualEvents.push({ type: 0, newVal, oldVal });
+		});
+
+		canReflect.onKeyValue(arr, 1, (newVal, oldVal) => {
+			actualEvents.push({ type: 1, newVal, oldVal });
+		});
+
+		canReflect.onKeyValue(arr, "length", (newVal, oldVal) => {
+			actualEvents.push({ type: "length", newVal, oldVal });
+		});
+
+		canReflect.onPatches(arr, (patches) => {
+			actualPatches.push(patches);
+		});
+
+		testSteps.forEach((step) => {
+			// reset everything
+			actualEvents = [];
+			actualPatches = [];
+
+			// get the data for the step
+			const { prop, value, events, patches } = step;
+
+			// set the value from the step
+			arr[prop] = value;
+
+			// check that the correct events and patches were dispatched
+			assert.deepEqual(actualEvents, events, `arr[${prop}] = "${value}" dispatched correct events`);
+			assert.deepEqual(actualPatches, patches, `arr[${prop}] = "${value}" dispatched correct patches`);
+		});
+	});
 };
