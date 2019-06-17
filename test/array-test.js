@@ -317,6 +317,19 @@ module.exports = function() {
 				]
 			},
 			// shift
+			{
+				initialData: [ "hi", "there" ],
+				method: "shift",
+				args: [],
+				events: [
+					{ type: 0, newVal: "there", oldVal: "hi" },
+					{ type: "length", newVal: 1, oldVal: 2 }
+				],
+				patches: [
+					[{ type: "set", index: 0, deleteCount: 0, insert: "there" }],
+					[{ type: "remove", index: 1, deleteCount: 1 }]
+				]
+			},
 			// splice - 0, 1
 			// splice - 0, 0, [ foo, bar ]
 			// splice - 0, 1, [ foo, bar ]
