@@ -241,4 +241,73 @@ module.exports = function() {
 			assert.deepEqual(actualPatches, patches, `arr[${prop}] = "${value}" dispatched correct patches`);
 		});
 	});
+
+	QUnit.test("array methods dispatch the correct events", function(assert) {
+		var testSteps = [
+			// push - 1 arg
+			{
+				method: "push",
+				args: [ "hi" ],
+				events: [
+					{ type: 0, newVal: "hi", oldVal: undefined },
+					{ type: "length", newVal: 1, oldVal: 0 }
+				],
+				patches: [
+					[{ type: "add", index: 0, deleteCount: 0, insert: "hi" }]
+				]
+			},
+			// push - multiple args
+			{
+				method: "push",
+				args: [ "hi", "there" ],
+				events: [
+					{ type: 0, newVal: "hi", oldVal: undefined },
+					{ type: "length", newVal: 1, oldVal: 0 },
+					{ type: 1, newVal: "there", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 }
+				],
+				patches: [
+					[{ type: "add", index: 0, deleteCount: 0, insert: "hi" }],
+					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }]
+				]
+			},
+			// unshift - 1 arg
+			// unshift - multiple args
+			// pop
+			// shift
+			// splice - 0, 1
+			// splice - 0, 0, [ foo, bar ]
+			// splice - 0, 1, [ foo, bar ]
+		];
+
+		testSteps.forEach((step) => {
+			// get the data for the step
+			const { method, args, events, patches, initialData = [] } = step;
+
+			const arr = new DefineArray(...initialData);
+			const actualEvents = [], actualPatches = [];
+
+			[0, 1, 2, 3, 5, 6].forEach((index) => {
+				canReflect.onKeyValue(arr, index, (newVal, oldVal) => {
+					actualEvents.push({ type: index, newVal, oldVal });
+				});
+			});
+
+			canReflect.onKeyValue(arr, "length", (newVal, oldVal) => {
+				actualEvents.push({ type: "length", newVal, oldVal });
+			});
+
+			canReflect.onPatches(arr, (patches) => {
+				actualPatches.push(patches);
+			});
+
+			// call the method from the step
+			arr[method].apply(arr, args);
+
+			// check that the correct events and patches were dispatched
+			assert.deepEqual(actualEvents, events, `arr[${method}](${args.join(",")}) dispatched correct events`);
+			assert.deepEqual(actualPatches, patches, `arr[${method}](${args.join(",")}) dispatched correct patches`);
+		});
+
+	});
 };
