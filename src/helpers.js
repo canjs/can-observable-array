@@ -71,7 +71,7 @@ const helpers = {
 				this.dispatch({ type: index }, [ newVal, oldVal ]);
 
 				if (how === "add") {
-					this.dispatch("length", [this.length, this.length - 1]);
+					this.dispatch("length", [index + 1, index]);
 				}
 
 			} else if (how === 'remove') {
@@ -91,7 +91,7 @@ const helpers = {
 				//!steal-remove-end
 				this.dispatch(dispatched, [ oldVal, index ]);
 
-				this.dispatch("length", [this.length, this.length + 1]);
+				this.dispatch("length", [index, index + 1]);
 
 			} else {
 				this.dispatch(how, [ newVal, index ]);

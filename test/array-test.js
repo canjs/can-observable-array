@@ -296,12 +296,10 @@ module.exports = function() {
 					{ type: "length", newVal: 3, oldVal: 2 },
 					{ type: 0, newVal: "how", oldVal: "you" },
 					{ type: 1, newVal: "are", oldVal: undefined },
-					// TODO - we're dispatching the same length event twice
-					{ type: "length", newVal: 3, oldVal: 2 }
+					{ type: "length", newVal: 2, oldVal: 1 }
 				],
 				patches: [
 					[{ type: "add", index: 2, deleteCount: 0, insert: "you" }],
-					// TODO - it seems like these two patches are out of order
 					[{ type: "set", index: 0, deleteCount: 0, insert: "how" }],
 					[{ type: "add", index: 1, deleteCount: 0, insert: "are" }]
 				]
