@@ -167,4 +167,237 @@ module.exports = function() {
 		let array = canReflect.new(DefineArray, undefined);
 		assert.deepEqual(array, [], "no values, just like with DefineList");
 	});
+
+	QUnit.test("setting values dispatch the correct events", function(assert) {
+		var testSteps = [
+			{
+				prop: 0,
+				value: "hi",
+				events: [
+					{ type: 0, newVal: "hi", oldVal: undefined },
+					{ type: "length", newVal: 1, oldVal: 0 }
+				],
+				patches: [
+					[{ type: "add", index: 0, deleteCount: 0, insert: "hi" }]
+				]
+			},
+			{
+				prop: 0,
+				value: "hello",
+				events: [
+					{ type: 0, newVal: "hello", oldVal: "hi" }
+				],
+				patches: [
+					[{ type: "set", index: 0, deleteCount: 0, insert: "hello" }]
+				]
+
+			},
+			{
+				prop: 1,
+				value: "there",
+				events: [
+					{ type: 1, newVal: "there", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 }
+				],
+				patches: [
+					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }]
+				]
+
+			},
+		];
+
+		const arr = new DefineArray();
+
+		let actualEvents, actualPatches;
+		canReflect.onKeyValue(arr, 0, (newVal, oldVal) => {
+			actualEvents.push({ type: 0, newVal, oldVal });
+		});
+
+		canReflect.onKeyValue(arr, 1, (newVal, oldVal) => {
+			actualEvents.push({ type: 1, newVal, oldVal });
+		});
+
+		canReflect.onKeyValue(arr, "length", (newVal, oldVal) => {
+			actualEvents.push({ type: "length", newVal, oldVal });
+		});
+
+		canReflect.onPatches(arr, (patches) => {
+			actualPatches.push(patches);
+		});
+
+		testSteps.forEach((step) => {
+			// reset everything
+			actualEvents = [];
+			actualPatches = [];
+
+			// get the data for the step
+			const { prop, value, events, patches } = step;
+
+			// set the value from the step
+			arr[prop] = value;
+
+			// check that the correct events and patches were dispatched
+			assert.deepEqual(actualEvents, events, `arr[${prop}] = "${value}" dispatched correct events`);
+			assert.deepEqual(actualPatches, patches, `arr[${prop}] = "${value}" dispatched correct patches`);
+		});
+	});
+
+	QUnit.test("array methods dispatch the correct events", function(assert) {
+		var testSteps = [
+			{
+				method: "push",
+				args: [ "hi" ],
+				events: [
+					{ type: 0, newVal: "hi", oldVal: undefined },
+					{ type: "length", newVal: 1, oldVal: 0 }
+				],
+				patches: [
+					[{ type: "add", index: 0, deleteCount: 0, insert: "hi" }]
+				]
+			},
+			{
+				method: "push",
+				args: [ "hi", "there" ],
+				events: [
+					{ type: 0, newVal: "hi", oldVal: undefined },
+					{ type: "length", newVal: 1, oldVal: 0 },
+					{ type: 1, newVal: "there", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 }
+				],
+				patches: [
+					[{ type: "add", index: 0, deleteCount: 0, insert: "hi" }],
+					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }]
+				]
+			},
+			{
+				initialData: [ "there" ],
+				method: "unshift",
+				args: [ "hello" ],
+				events: [
+					{ type: 1, newVal: "there", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 },
+					{ type: 0, newVal: "hello", oldVal: "there" }
+				],
+				patches: [
+					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }],
+					[{ type: "set", index: 0, deleteCount: 0, insert: "hello" }],
+				]
+			},
+			{
+				initialData: [ "you" ],
+				method: "unshift",
+				args: [ "how", "are" ],
+				events: [
+					{ type: 2, newVal: "you", oldVal: undefined },
+					{ type: "length", newVal: 3, oldVal: 2 },
+					{ type: 0, newVal: "how", oldVal: "you" },
+					{ type: 1, newVal: "are", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 }
+				],
+				patches: [
+					[{ type: "add", index: 2, deleteCount: 0, insert: "you" }],
+					[{ type: "set", index: 0, deleteCount: 0, insert: "how" }],
+					[{ type: "add", index: 1, deleteCount: 0, insert: "are" }]
+				]
+			},
+			{
+				initialData: [ "hi", "there" ],
+				method: "pop",
+				args: [],
+				events: [
+					{ type: "length", newVal: 1, oldVal: 2 }
+				],
+				patches: [
+					[{ type: "remove", index: 1, deleteCount: 1 }]
+				]
+			},
+			{
+				initialData: [ "hi", "there" ],
+				method: "shift",
+				args: [],
+				events: [
+					{ type: 0, newVal: "there", oldVal: "hi" },
+					{ type: "length", newVal: 1, oldVal: 2 }
+				],
+				patches: [
+					[{ type: "set", index: 0, deleteCount: 0, insert: "there" }],
+					[{ type: "remove", index: 1, deleteCount: 1 }]
+				]
+			},
+			{
+				initialData: [ "hi" ],
+				method: "splice",
+				args: [ 0, 1 ],
+				events: [
+					{ type: "length", newVal: 0, oldVal: 1 }
+				],
+				patches: [
+					[{ type: "remove", index: 0, deleteCount: 1 }]
+				]
+			},
+			{
+				initialData: [ "there" ],
+				method: "splice",
+				args: [ 0, 0, "hi" ],
+				events: [
+					{ type: 1, newVal: "there", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 },
+					{ type: 0, newVal: "hi", oldVal: "there" },
+				],
+				patches: [
+					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }],
+					[{ type: "set", index: 0, deleteCount: 0, insert: "hi" }],
+				]
+			},
+			{
+				initialData: [ "hi" ],
+				method: "splice",
+				args: [ 0, 1, "hello", "there" ],
+				events: [
+					{ type: 0, newVal: "hello", oldVal: "hi" },
+					{ type: 1, newVal: "there", oldVal: undefined },
+					{ type: "length", newVal: 2, oldVal: 1 },
+				],
+				patches: [
+					[{ type: "set", index: 0, deleteCount: 0, insert: "hello" }],
+					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }],
+				]
+			}
+		];
+
+		class Arr extends DefineArray {
+			static get items() {
+				return String;
+			}
+		}
+		testSteps.forEach((step) => {
+			// get the data for the step
+			const { method, args, events, patches, initialData = [] } = step;
+
+			const arr = new Arr(...initialData);
+			const actualEvents = [], actualPatches = [];
+
+			[0, 1, 2, 3, 5, 6].forEach((index) => {
+				canReflect.onKeyValue(arr, index, (newVal, oldVal) => {
+					actualEvents.push({ type: index, newVal, oldVal });
+				});
+			});
+
+			canReflect.onKeyValue(arr, "length", (newVal, oldVal) => {
+				actualEvents.push({ type: "length", newVal, oldVal });
+			});
+
+			canReflect.onPatches(arr, (patches) => {
+				actualPatches.push(patches);
+			});
+
+			// call the method from the step
+			arr[method].apply(arr, args);
+
+			// check that the correct events and patches were dispatched
+			assert.deepEqual(actualEvents, events, `arr[${method}](${args.join(",")}) dispatched correct events`);
+			assert.deepEqual(actualPatches, patches, `arr[${method}](${args.join(",")}) dispatched correct patches`);
+		});
+
+	});
 };

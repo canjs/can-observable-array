@@ -68,15 +68,18 @@ const helpers = {
 				}
 				//!steal-remove-end
 				this.dispatch(dispatched, [ newVal, index ]);
-				this.dispatch("length", [this.length, this.length - 1]);
 				this.dispatch({ type: index }, [ newVal, oldVal ]);
+
+				if (how === "add") {
+					this.dispatch("length", [index + 1, index]);
+				}
 
 			} else if (how === 'remove') {
 				if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 					ObservationRecorder.ignore(itemsDefinition.removed).call(this, oldVal, index);
 				}
 
-				patches = [{type: how, index: index, deleteCount: oldVal.length}];
+				patches = [{type: how, index: index, deleteCount: 1}];
 				dispatched = {
 					type: 'splice',
 					patches: patches
@@ -87,6 +90,8 @@ const helpers = {
 				}
 				//!steal-remove-end
 				this.dispatch(dispatched, [ oldVal, index ]);
+
+				this.dispatch("length", [index, index + 1]);
 
 			} else {
 				this.dispatch(how, [ newVal, index ]);
