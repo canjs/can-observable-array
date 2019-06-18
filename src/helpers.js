@@ -1,7 +1,7 @@
 const canReflect = require("can-reflect");
-const mapBindings = require("can-event-queue/map/map");
 const ObservationRecorder = require("can-observation-recorder");
-const inSetupSymbol = Symbol.for("can.initializing");
+const mapBindings = require("can-event-queue/map/map");
+const metaSymbol = Symbol.for("can.meta");
 
 const helpers = {
 	assignNonEnumerable: function(obj, key, value) {
@@ -12,28 +12,6 @@ const helpers = {
 		    value: value
 		});
 	},
-	eventDispatcher: function(map, prop, current, newVal) {
-		if (map[inSetupSymbol]) {
-			return;
-		}
-		else {
-			if (newVal !== current) {
-				var dispatched = {
-					patches: [{type: "set", key: prop, value: newVal}],
-					type: prop,
-					target: map
-				};
-
-				//!steal-remove-start
-				if(process.env.NODE_ENV !== 'production') {
-					dispatched.reasonLog = [ canReflect.getName(this) + "'s", prop, "changed to", newVal, "from", current ];
-				}
-				//!steal-remove-end
-
-				mapBindings.dispatch.call(map, dispatched, [newVal, current]);
-			}
-		}
-	},
 	shouldRecordObservationOnAllKeysExceptFunctionsOnProto: function(keyInfo, meta){
 		return meta.preventSideEffects === 0 && !keyInfo.isAccessor && (
 			// it's on us
@@ -43,58 +21,54 @@ const helpers = {
 			(!keyInfo.protoHasKey && !Object.isSealed(meta.target)) || keyInfo.protoHasKey && (typeof targetValue !== "function"))
 		);
 	},
-	triggerChange: function(attr, how, newVal, oldVal) {
+	/*
+	 * dispatch an event when an index changes
+	 */
+	dispatchIndexEvent: function(attr, how, newVal, oldVal) {
 		var index = +attr;
-		// `batchTrigger` direct add and remove events...
-
 		// Make sure this is not nested and not an expando
 		if (!isNaN(index)) {
 			var itemsDefinition = this._define.definitions["#"];
-			var patches, dispatched;
-			if (how === 'add' || how === 'set') {
+			if (how === 'set') {
+				this.dispatch({ type: index }, [ newVal, oldVal ]);
+
+				// if event is being set through an DefineArray.prototype method,
+				// do not dispatch length or patch events.
+				// This will be handled by DefineArray.prototype method.
+				let meta = this[metaSymbol];
+				if (!("preventSideEffects" in meta) || meta.preventSideEffects === 0) {
+					let patches = [{
+						index: index,
+						deleteCount: 1,
+						insert: [ newVal ],	
+						type: "splice"
+					}];
+					helpers.dispatchLengthPatch.call(this, how, patches, this.length, this.length);
+				}
+			} else if (how === 'add') {
 				if (itemsDefinition && typeof itemsDefinition.added === 'function') {
 					ObservationRecorder.ignore(itemsDefinition.added).call(this, newVal, index);
 				}
 
-				patches = [{type: how, insert: newVal, index: index, deleteCount: 0}];
-				dispatched = {
-					type: 'splice',
-					patches: patches
-				};
-
-				//!steal-remove-start
-				if(process.env.NODE_ENV !== 'production') {
-					dispatched.reasonLog = [ canReflect.getName(this), "added", newVal, "at", index ];
-				}
-				//!steal-remove-end
-				this.dispatch(dispatched, [ newVal, index ]);
 				this.dispatch({ type: index }, [ newVal, oldVal ]);
 
-				if (how === "add") {
-					this.dispatch("length", [index + 1, index]);
+				// if event is being set through an DefineArray.prototype method,
+				// do not dispatch length or patch events.
+				// This will be handled by DefineArray.prototype method.
+				let meta = this[metaSymbol];
+				if (!("preventSideEffects" in meta) || meta.preventSideEffects === 0) {
+					let patches = [{
+						index: index,
+						deleteCount: 0,
+						insert: [ newVal ],	
+						type: "splice"
+					}];
+					helpers.dispatchLengthPatch.call(this, how, patches, this.length, this.length - 1);
 				}
-
 			} else if (how === 'remove') {
 				if (itemsDefinition && typeof itemsDefinition.removed === 'function') {
 					ObservationRecorder.ignore(itemsDefinition.removed).call(this, oldVal, index);
 				}
-
-				patches = [{type: how, index: index, deleteCount: 1}];
-				dispatched = {
-					type: 'splice',
-					patches: patches
-				};
-				//!steal-remove-start
-				if(process.env.NODE_ENV !== 'production') {
-					dispatched.reasonLog = [ canReflect.getName(this), "remove", oldVal, "at", index ];
-				}
-				//!steal-remove-end
-				this.dispatch(dispatched, [ oldVal, index ]);
-
-				this.dispatch("length", [index, index + 1]);
-
-			} else {
-				this.dispatch(how, [ newVal, index ]);
 			}
 		} else {
 			this.dispatch({
@@ -102,6 +76,23 @@ const helpers = {
 				target: this
 			}, [ newVal, oldVal ]);
 		}
+	},
+	/*
+	 * Dispatch a `type: "splice"` patch and a `length` event
+	 */
+	dispatchLengthPatch: function(how, patches, newLength, oldLength) {
+		const dispatchArgs = {
+			type: "length",
+			patches: patches
+		};
+
+		//!steal-remove-start
+		if(process.env.NODE_ENV !== "production") {
+			dispatchArgs.reasonLog = [canReflect.getName(this) + "." + how + " called with", arguments];
+		}
+		//!steal-remove-end
+
+		mapBindings.dispatch.call(this, dispatchArgs, [newLength, oldLength]);
 	}
 };
 

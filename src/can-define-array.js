@@ -2,10 +2,12 @@ const canReflect = require("can-reflect");
 const {
 	makeDefineInstanceKey,
 	mixins,
-
 	mixinMapProps,
 	mixinTypeEvents
 } = require("can-define-mixin");
+const {
+	dispatchLengthPatch
+} = require("./helpers");
 const ProxyArray = require("./proxy-array")();
 const queues = require("can-queues");
 
@@ -13,6 +15,7 @@ const queues = require("can-queues");
 const localOnPatchesSymbol = "can.patches";
 const onKeyValueSymbol = Symbol.for("can.onKeyValue");
 const offKeyValueSymbol = Symbol.for("can.offKeyValue");
+const metaSymbol = Symbol.for("can.meta");
 
 function convertItems(Constructor, items) {
 	if(items.length) {
@@ -135,6 +138,62 @@ class DefineArray extends MixedInArray {
 		return true;
 	}
 }
+
+var mutateMethods = {
+	"push": function(arr, args) {
+		return [{
+			index: arr.length - args.length,
+			deleteCount: 0,
+			insert: args,
+			type: "splice"
+		}];
+	},
+	"pop": function(arr) {
+		return [{
+			index: arr.length,
+			deleteCount: 1,
+			type: "splice"
+		}];
+	},
+	"shift": function() {
+		return [{
+			index: 0,
+			deleteCount: 1,
+			type: "splice"
+		}];
+	},
+	"unshift": function(arr, args) {
+		return [{
+			index: 0,
+			deleteCount: 0,
+			insert: args,
+			type: "splice"
+		}];
+	},
+	"splice": function(arr, args) {
+		return [{
+			index: args[0],
+			deleteCount: args[1],
+			insert: args.slice(2),
+			type: "splice"
+		}];
+	}
+};
+
+canReflect.eachKey(mutateMethods, function(makePatches, prop) {
+	const protoFn = DefineArray.prototype[prop];
+	DefineArray.prototype[prop] = function() {
+		const oldLength = this.length;
+
+		// prevent `length` event from being dispatched by get/set proxy hooks
+		this[metaSymbol].preventSideEffects++;
+		protoFn.apply(this, arguments);
+		this[metaSymbol].preventSideEffects--;
+
+		const patches = makePatches(this, Array.from(arguments));
+		dispatchLengthPatch.call(this, prop, patches, this.length, oldLength);
+	};
+});
 
 makeDefineInstanceKey(DefineArray);
 
