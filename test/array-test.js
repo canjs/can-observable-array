@@ -78,15 +78,11 @@ module.exports = function() {
 			{ name: "cook dinner", completed: true }
 		);
 
-		let expected = 3, actual = 0;
+		let expected = 2, actual = 0;
 
 		canReflect.onPatches(todos, patches => {
-			if(patches[0].type === "set") {
-				assert.ok(true, "set patch called");
-				actual++;
-			}
-			if(patches[0].type === "remove") {
-				assert.ok(true, "remove patch called");
+			if(patches[0].type === "splice") {
+				assert.ok(true, "splice patch called");
 				actual++;
 			}
 		});
@@ -108,15 +104,11 @@ module.exports = function() {
 			{ name: "cook dinner", completed: true }
 		);
 
-		let expected = 3, actual = 0;
+		let expected = 2, actual = 0;
 
 		canReflect.onPatches(todos, patches => {
-			if(patches[0].type === "set") {
+			if(patches[0].type === "splice") {
 				assert.ok(true, "set patch called");
-				actual++;
-			}
-			if(patches[0].type === "remove") {
-				assert.ok(true, "remove patch called");
 				actual++;
 			}
 		});
@@ -148,8 +140,8 @@ module.exports = function() {
 		let expected = 2, actual = 0;
 
 		canReflect.onPatches(hobbies, patches => {
-			if(patches[0].type === "add") {
-				assert.ok(true, "add patches called");
+			if(patches[0].type === "splice") {
+				assert.ok(true, "splice patches called");
 				actual++;
 			}
 		});
@@ -178,17 +170,18 @@ module.exports = function() {
 					{ type: "length", newVal: 1, oldVal: 0 }
 				],
 				patches: [
-					[{ type: "add", index: 0, deleteCount: 0, insert: "hi" }]
+					[{ type: "splice", index: 0, deleteCount: 0, insert: ["hi"] }]
 				]
 			},
 			{
 				prop: 0,
 				value: "hello",
 				events: [
-					{ type: 0, newVal: "hello", oldVal: "hi" }
+					{ type: 0, newVal: "hello", oldVal: "hi" },
+					{ type: "length", newVal: 1, oldVal: 1 }
 				],
 				patches: [
-					[{ type: "set", index: 0, deleteCount: 0, insert: "hello" }]
+					[{ type: "splice", index: 0, deleteCount: 1, insert: ["hello"] }]
 				]
 
 			},
@@ -200,7 +193,7 @@ module.exports = function() {
 					{ type: "length", newVal: 2, oldVal: 1 }
 				],
 				patches: [
-					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }]
+					[{ type: "splice", index: 1, deleteCount: 0, insert: ["there"] }]
 				]
 
 			},
@@ -252,7 +245,7 @@ module.exports = function() {
 					{ type: "length", newVal: 1, oldVal: 0 }
 				],
 				patches: [
-					[{ type: "add", index: 0, deleteCount: 0, insert: "hi" }]
+					[{ type: "splice", index: 0, deleteCount: 0, insert: ["hi"] }]
 				]
 			},
 			{
@@ -260,13 +253,11 @@ module.exports = function() {
 				args: [ "hi", "there" ],
 				events: [
 					{ type: 0, newVal: "hi", oldVal: undefined },
-					{ type: "length", newVal: 1, oldVal: 0 },
 					{ type: 1, newVal: "there", oldVal: undefined },
-					{ type: "length", newVal: 2, oldVal: 1 }
+					{ type: "length", newVal: 2, oldVal: 0 }
 				],
 				patches: [
-					[{ type: "add", index: 0, deleteCount: 0, insert: "hi" }],
-					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }]
+					[{ type: "splice", index: 0, deleteCount: 0, insert: ["hi", "there"] }]
 				]
 			},
 			{
@@ -275,12 +266,11 @@ module.exports = function() {
 				args: [ "hello" ],
 				events: [
 					{ type: 1, newVal: "there", oldVal: undefined },
-					{ type: "length", newVal: 2, oldVal: 1 },
-					{ type: 0, newVal: "hello", oldVal: "there" }
+					{ type: 0, newVal: "hello", oldVal: "there" },
+					{ type: "length", newVal: 2, oldVal: 1 }
 				],
 				patches: [
-					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }],
-					[{ type: "set", index: 0, deleteCount: 0, insert: "hello" }],
+					[{ type: "splice", index: 0, deleteCount: 0, insert: ["hello"] }],
 				]
 			},
 			{
@@ -289,15 +279,12 @@ module.exports = function() {
 				args: [ "how", "are" ],
 				events: [
 					{ type: 2, newVal: "you", oldVal: undefined },
-					{ type: "length", newVal: 3, oldVal: 2 },
 					{ type: 0, newVal: "how", oldVal: "you" },
 					{ type: 1, newVal: "are", oldVal: undefined },
-					{ type: "length", newVal: 2, oldVal: 1 }
+					{ type: "length", newVal: 3, oldVal: 1 }
 				],
 				patches: [
-					[{ type: "add", index: 2, deleteCount: 0, insert: "you" }],
-					[{ type: "set", index: 0, deleteCount: 0, insert: "how" }],
-					[{ type: "add", index: 1, deleteCount: 0, insert: "are" }]
+					[{ type: "splice", index: 0, deleteCount: 0, insert: ["how", "are"] }],
 				]
 			},
 			{
@@ -308,7 +295,7 @@ module.exports = function() {
 					{ type: "length", newVal: 1, oldVal: 2 }
 				],
 				patches: [
-					[{ type: "remove", index: 1, deleteCount: 1 }]
+					[{ type: "splice", index: 1, deleteCount: 1 }]
 				]
 			},
 			{
@@ -320,8 +307,7 @@ module.exports = function() {
 					{ type: "length", newVal: 1, oldVal: 2 }
 				],
 				patches: [
-					[{ type: "set", index: 0, deleteCount: 0, insert: "there" }],
-					[{ type: "remove", index: 1, deleteCount: 1 }]
+					[{ type: "splice", index: 0, deleteCount: 1 }]
 				]
 			},
 			{
@@ -332,7 +318,7 @@ module.exports = function() {
 					{ type: "length", newVal: 0, oldVal: 1 }
 				],
 				patches: [
-					[{ type: "remove", index: 0, deleteCount: 1 }]
+					[{ type: "splice", index: 0, deleteCount: 1, insert: [] }]
 				]
 			},
 			{
@@ -341,12 +327,11 @@ module.exports = function() {
 				args: [ 0, 0, "hi" ],
 				events: [
 					{ type: 1, newVal: "there", oldVal: undefined },
-					{ type: "length", newVal: 2, oldVal: 1 },
 					{ type: 0, newVal: "hi", oldVal: "there" },
+					{ type: "length", newVal: 2, oldVal: 1 }
 				],
 				patches: [
-					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }],
-					[{ type: "set", index: 0, deleteCount: 0, insert: "hi" }],
+					[{ type: "splice", index: 0, deleteCount: 0, insert: ["hi"] }],
 				]
 			},
 			{
@@ -359,8 +344,7 @@ module.exports = function() {
 					{ type: "length", newVal: 2, oldVal: 1 },
 				],
 				patches: [
-					[{ type: "set", index: 0, deleteCount: 0, insert: "hello" }],
-					[{ type: "add", index: 1, deleteCount: 0, insert: "there" }],
+					[{ type: "splice", index: 0, deleteCount: 1, insert: ["hello", "there"] }],
 				]
 			}
 		];

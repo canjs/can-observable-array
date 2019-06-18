@@ -5,7 +5,7 @@ const ObservationRecorder = require("can-observation-recorder");
 const {
 	assignNonEnumerable,
 	shouldRecordObservationOnAllKeysExceptFunctionsOnProto,
-	triggerChange
+	dispatchIndexEvent
 } = require("./helpers");
 const { mixins } = require("can-define-mixin");
 
@@ -189,7 +189,7 @@ const proxyHandlers = {
 		setValueAndOnChange(key, newValue, target, proxy, function onChange(hadOwn, oldValue) {
 
 			if (Number.isInteger(key)) {
-				triggerChange.call(
+				dispatchIndexEvent.call(
 					receiver,
 					key,
 					hadOwn ? (newValue ? "set" : "remove") : "add",
@@ -207,7 +207,7 @@ const proxyHandlers = {
 
 		// Fire event handlers if we were able to delete and the value changed.
 		if (deleteSuccessful && this.preventSideEffects === 0 && old !== undefined) {
-			triggerChange.call(
+			dispatchIndexEvent.call(
 				this.proxy,
 				key,
 				"remove",
