@@ -177,6 +177,22 @@ var mutateMethods = {
 			insert: args.slice(2),
 			type: "splice"
 		}];
+	},
+	"sort": function(arr) {
+		return [{
+			index: 0,
+			deleteCount: arr.length,
+			insert: arr,
+			type: "splice"
+		}];
+	},
+	"reverse": function(arr) {
+		return [{
+			index: 0,
+			deleteCount: arr.length,
+			insert: arr,
+			type: "splice"
+		}];
 	}
 };
 
