@@ -346,6 +346,33 @@ module.exports = function() {
 				patches: [
 					[{ type: "splice", index: 0, deleteCount: 1, insert: ["hello", "there"] }],
 				]
+			},
+			{
+				initialData: [ "fff", "xxx", "aaa" ],
+				method: "sort",
+				args: [],
+				events: [
+					{ type: 0, newVal: "aaa", oldVal: "fff" },
+					{ type: 1, newVal: "fff", oldVal: "xxx" },
+					{ type: 2, newVal: "xxx", oldVal: "aaa" },
+					{ type: "length", newVal: 3, oldVal: 3 }
+				],
+				patches: [
+					[{ type: "splice", index: 0, deleteCount: 3, insert: ["aaa", "fff", "xxx"] }],
+				]
+			},
+			{
+				initialData: [ "fff", "xxx", "aaa" ],
+				method: "reverse",
+				args: [],
+				events: [
+					{ type: 0, newVal: "aaa", oldVal: "fff" },
+					{ type: 2, newVal: "fff", oldVal: "aaa" },
+					{ type: "length", newVal: 3, oldVal: 3 }
+				],
+				patches: [
+					[{ type: "splice", index: 0, deleteCount: 3, insert: ["aaa", "xxx", "fff"] }],
+				]
 			}
 		];
 
