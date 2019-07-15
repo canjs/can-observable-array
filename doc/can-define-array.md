@@ -4,6 +4,7 @@
 @group can-define-array/static 0 static
 @group can-define-array/prototype 1 prototype
 @alias can.DefineArray
+@package ../package.json
 @templateRender true
 
 @description Create observable arrays with defined properties.
