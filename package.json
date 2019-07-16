@@ -10,6 +10,7 @@
     "prepublishOnly": "npm run compile-to-es5",
     "preversion": "npm test",
     "version": "git commit -am \"Update version number\"",
+    "postpublish": "git push --tags && git push",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
