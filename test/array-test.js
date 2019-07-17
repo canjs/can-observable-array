@@ -1,10 +1,10 @@
 const canReflect = require("can-reflect");
-const DefineArray = require("../src/can-define-array");
+const ObservableArray = require("../src/can-observable-array");
 const QUnit = require("steal-qunit");
 
 module.exports = function() {
 	QUnit.test("Adds proxyability to arrays", function(assert) {
-		class Todos extends DefineArray {}
+		class Todos extends ObservableArray {}
 
 		let todos = new Todos();
 		let calls = 0;
@@ -27,7 +27,7 @@ module.exports = function() {
 	});
 
 	QUnit.test(".filter can be provided an object", function(assert) {
-		class Todos extends DefineArray {}
+		class Todos extends ObservableArray {}
 
 		let todos = new Todos(...[
 			{ name: "walk the dog" },
@@ -41,7 +41,7 @@ module.exports = function() {
 	});
 
 	QUnit.test("canReflect.new creates a new array with items", function(assert) {
-		class Todos extends DefineArray {}
+		class Todos extends ObservableArray {}
 
 		let todos = canReflect.new(Todos, [
 			{ name: "walk the dog" },
@@ -53,7 +53,7 @@ module.exports = function() {
 	});
 
 	QUnit.test("forEach works", function(assert) {
-		class Todos extends DefineArray {}
+		class Todos extends ObservableArray {}
 
 		let todos = new Todos(...[
 			{ name: "walk the dog" },
@@ -71,7 +71,7 @@ module.exports = function() {
 	});
 
 	QUnit.test("splice dispatches patches and length events", function(assert) {
-		class Todos extends DefineArray {}
+		class Todos extends ObservableArray {}
 
 		let todos = new Todos(
 			{ name: "walk the dog" },
@@ -97,7 +97,7 @@ module.exports = function() {
 	});
 
 	QUnit.test("can.splice dispatches patches and length events", function(assert) {
-		class Todos extends DefineArray {}
+		class Todos extends ObservableArray {}
 
 		let todos = new Todos(
 			{ name: "walk the dog" },
@@ -123,10 +123,10 @@ module.exports = function() {
 	});
 
 	QUnit.test("isListLike", function(assert) {
-		let array = new DefineArray("one", "two");
+		let array = new ObservableArray("one", "two");
 		assert.equal(canReflect.isListLike(array), true, "it is list like");
 
-		class Extended extends DefineArray {
+		class Extended extends ObservableArray {
 		}
 
 		let extended = new Extended("one", "two");
@@ -134,7 +134,7 @@ module.exports = function() {
 	});
 
 	QUnit.test("push dispatches patches and length events", function(assert) {
-		class Hobbies extends DefineArray {}
+		class Hobbies extends ObservableArray {}
 		const hobbies = new Hobbies();
 
 		let expected = 2, actual = 0;
@@ -156,7 +156,7 @@ module.exports = function() {
 	});
 
 	QUnit.test("can take undefined as a value with can.new", function(assert) {
-		let array = canReflect.new(DefineArray, undefined);
+		let array = canReflect.new(ObservableArray, undefined);
 		assert.deepEqual(array, [], "no values, just like with DefineList");
 	});
 
@@ -199,7 +199,7 @@ module.exports = function() {
 			},
 		];
 
-		const arr = new DefineArray();
+		const arr = new ObservableArray();
 
 		let actualEvents, actualPatches;
 		canReflect.onKeyValue(arr, 0, (newVal, oldVal) => {
@@ -376,7 +376,7 @@ module.exports = function() {
 			}
 		];
 
-		class Arr extends DefineArray {
+		class Arr extends ObservableArray {
 			static get items() {
 				return String;
 			}

@@ -1,5 +1,5 @@
-@function can-define-array/array.prototype.filter filter
-@parent can-define-array/prototype
+@function can-observable-array/array.prototype.filter filter
+@parent can-observable-array/prototype
 
 Filter an array returning a subset of the items based on a predicate.
 
@@ -8,16 +8,16 @@ Filter an array returning a subset of the items based on a predicate.
   Filter an array of items based on a function predicate.
 
   ```js
-  import { DefineArray, DefineObject } from "can/everything";
+  import { ObservableArray, ObservableObject } from "can/everything";
 
-  class Cartoon extends DefineObject {
-    static define = {
+  class Cartoon extends ObservableObject {
+    static props = {
       title: String,
       studio: String
     }
   }
 
-  class Cartoons extends DefineArray {
+  class Cartoons extends ObservableArray {
     static items = Cartoon;
   }
 
@@ -37,23 +37,23 @@ Filter an array returning a subset of the items based on a predicate.
 
   @param {function():Boolean} fn A predicate function that will be run for each item in the array. If the function returns true, the item will be included in the filtered resultset.
 
-  @return {DefineArray} A `DefineArray` matching the type of the original array.
+  @return {ObservableArray} A `ObservableArray` matching the type of the original array.
 
 @signature `filter(props)`
 
   Filter an array of items that match a subset of properties. A match will be made if any properties provided to `props` are within an item.
 
   ```js
-  import { DefineArray, DefineObject } from "can/everything";
+  import { ObservableArray, ObservableObject } from "can/everything";
 
-  class Cartoon extends DefineObject {
-    static define = {
+  class Cartoon extends ObservableObject {
+    static props = {
       title: String,
       studio: String
     }
   }
 
-  class Cartoons extends DefineArray {
+  class Cartoons extends ObservableArray {
     static items = Cartoon;
   }
 
@@ -72,4 +72,4 @@ Filter an array returning a subset of the items based on a predicate.
   @codepen
 
   @param {{}} props  An object of properties to be matched against.
-  @return {DefineArray} A `DefineArray` matching the type of the original array.
+  @return {ObservableArray} A `ObservableArray` matching the type of the original array.

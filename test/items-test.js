@@ -1,13 +1,13 @@
-const DefineArray = require("../src/can-define-array");
-const DefineObject = require("can-define-object");
+const ObservableArray = require("../src/can-observable-array");
+const ObservableObject = require("can-observable-object");
 const QUnit = require("steal-qunit");
 
 module.exports = function() {
-	QUnit.module("ExtendedDefineArray.items");
+	QUnit.module("ExtendedObservableArray.items");
 
 	QUnit.test("calling new with items", function(assert) {
-		class Todo extends DefineObject {}
-		class TodoList extends DefineArray {
+		class Todo extends ObservableObject {}
+		class TodoList extends ObservableArray {
 			static get items() {
 				return Todo;
 			}
@@ -20,8 +20,8 @@ module.exports = function() {
 	});
 
 	QUnit.test(".splice", function(assert) {
-		class Todo extends DefineObject {}
-		class TodoList extends DefineArray {
+		class Todo extends ObservableObject {}
+		class TodoList extends ObservableArray {
 			static get items() {
 				return Todo;
 			}
@@ -35,8 +35,8 @@ module.exports = function() {
 	});
 
 	QUnit.test(".push", function(assert) {
-		class Todo extends DefineObject {}
-		class TodoList extends DefineArray {
+		class Todo extends ObservableObject {}
+		class TodoList extends ObservableArray {
 			static get items() {
 				return Todo;
 			}
@@ -50,8 +50,8 @@ module.exports = function() {
 	});
 
 	QUnit.test(".unshift", function(assert) {
-		class Todo extends DefineObject {}
-		class TodoList extends DefineArray {
+		class Todo extends ObservableObject {}
+		class TodoList extends ObservableArray {
 			static get items() {
 				return Todo;
 			}
@@ -65,8 +65,8 @@ module.exports = function() {
 	});
 
 	QUnit.test("The new Array(length) form works", function(assert) {
-		class Pet extends DefineObject {
-			static get define() {
+		class Pet extends ObservableObject {
+			static get props() {
 				return {
 					name: {
 						type: String,
@@ -75,7 +75,7 @@ module.exports = function() {
 				};
 			}
 		}
-		class Pets extends DefineArray {
+		class Pets extends ObservableArray {
 			static get items() { return Pet; }
 		}
 		try {
