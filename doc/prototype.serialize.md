@@ -1,5 +1,5 @@
-@function can-define-array/array.prototype.serialize serialize
-@parent can-define-array/prototype
+@function can-observable-array/array.prototype.serialize serialize
+@parent can-observable-array/prototype
 
 Returns the a serialized version of this array.
 
@@ -10,9 +10,9 @@ Returns the a serialized version of this array.
   Each items serialized value is the result of calling [can-reflect.serialize canReflect.serialize()] on the item.
 
   ```js
-  import { DefineArray } from "can/everything";
+  import { ObservableArray } from "can/everything";
 
-  const array = new DefineArray("first", {foo: "bar"});
+  const array = new ObservableArray("first", {foo: "bar"});
   const serializedArray = array.serialize();
 
   console.log(serializedArray); //-> ["first", {foo: "bar"}]

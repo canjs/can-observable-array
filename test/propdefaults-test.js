@@ -1,12 +1,12 @@
-const DefineArray = require("../src/can-define-array");
+const ObservableArray = require("../src/can-observable-array");
 const QUnit = require("steal-qunit");
 const type = require("can-type");
 
 module.exports = function() {
-	QUnit.module("ExendedDefineArray.propertyDefaults");
+	QUnit.module("ExendedObservableArray.propertyDefaults");
 
 	QUnit.test("Does type conversion", function(assert) {
-		class Players extends DefineArray {
+		class Players extends ObservableArray {
 			static get propertyDefaults() {
 				return {
 					type: type.convert(Number)

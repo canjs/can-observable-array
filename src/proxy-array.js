@@ -7,7 +7,7 @@ const {
 	shouldRecordObservationOnAllKeysExceptFunctionsOnProto,
 	dispatchIndexEvent
 } = require("./helpers");
-const { mixins } = require("can-define-mixin");
+const { mixins } = require("can-observable-mixin");
 
 const hasOwn = Object.prototype.hasOwnProperty;
 const { isSymbolLike } = canReflect;

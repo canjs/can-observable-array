@@ -32,9 +32,9 @@ const helpers = {
 			if (how === 'set') {
 				this.dispatch({ type: index }, [ newVal, oldVal ]);
 
-				// if event is being set through an DefineArray.prototype method,
+				// if event is being set through an ObservableArray.prototype method,
 				// do not dispatch length or patch events.
-				// This will be handled by DefineArray.prototype method.
+				// This will be handled by ObservableArray.prototype method.
 				let meta = this[metaSymbol];
 				if (!("preventSideEffects" in meta) || meta.preventSideEffects === 0) {
 					let patches = [{
@@ -52,9 +52,9 @@ const helpers = {
 
 				this.dispatch({ type: index }, [ newVal, oldVal ]);
 
-				// if event is being set through an DefineArray.prototype method,
+				// if event is being set through an ObservableArray.prototype method,
 				// do not dispatch length or patch events.
-				// This will be handled by DefineArray.prototype method.
+				// This will be handled by ObservableArray.prototype method.
 				let meta = this[metaSymbol];
 				if (!("preventSideEffects" in meta) || meta.preventSideEffects === 0) {
 					let patches = [{

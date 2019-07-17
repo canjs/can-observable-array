@@ -4,7 +4,7 @@ const {
 	mixins,
 	mixinMapProps,
 	mixinTypeEvents
-} = require("can-define-mixin");
+} = require("can-observable-mixin");
 const {
 	dispatchLengthPatch
 } = require("./helpers");
@@ -29,7 +29,7 @@ function convertItems(Constructor, items) {
 
 const MixedInArray = mixinTypeEvents(mixinMapProps(ProxyArray));
 
-class DefineArray extends MixedInArray {
+class ObservableArray extends MixedInArray {
 	// TODO define stuff here
 	constructor(...items) {
 		// Arrays can be passed a length like `new Array(15)`
@@ -197,8 +197,8 @@ var mutateMethods = {
 };
 
 canReflect.eachKey(mutateMethods, function(makePatches, prop) {
-	const protoFn = DefineArray.prototype[prop];
-	DefineArray.prototype[prop] = function() {
+	const protoFn = ObservableArray.prototype[prop];
+	ObservableArray.prototype[prop] = function() {
 		const oldLength = this.length;
 
 		// prevent `length` event from being dispatched by get/set proxy hooks
@@ -211,6 +211,6 @@ canReflect.eachKey(mutateMethods, function(makePatches, prop) {
 	};
 });
 
-makeDefineInstanceKey(DefineArray);
+makeDefineInstanceKey(ObservableArray);
 
-module.exports = DefineArray;
+module.exports = ObservableArray;
