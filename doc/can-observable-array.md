@@ -1,6 +1,6 @@
 @module {function} can-observable-array
 @parent can-observables
-@collection can-ecosystem
+@collection can-core
 @group can-observable-array/static 0 static
 @group can-observable-array/prototype 1 prototype
 @alias can.ObservableArray
