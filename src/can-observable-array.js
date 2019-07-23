@@ -10,7 +10,6 @@ const {
 } = require("./helpers");
 const ProxyArray = require("./proxy-array")();
 const queues = require("can-queues");
-const { normalizeTypeDefinition } = require("can-observable-mixin/dist/define-helpers");
 
 // symbols aren't enumerable ... we'd need a version of Object that treats them that way
 const localOnPatchesSymbol = "can.patches";
@@ -20,7 +19,7 @@ const metaSymbol = Symbol.for("can.meta");
 
 function convertItem (Constructor, item) {
 	if(Constructor.items) {
-		const definition = normalizeTypeDefinition(Constructor.items.type || Constructor.items);
+		const definition = mixins.normalizeTypeDefinition(Constructor.items.type || Constructor.items);
 		return canReflect.convert(item, definition);
 	}
 	return item;
