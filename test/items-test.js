@@ -86,4 +86,33 @@ module.exports = function() {
 		}
 
 	});
+
+	QUnit.test("#29 items property definition as object", function(assert) {
+		class Person extends ObservableObject {
+			static get props() {
+				return {
+					name: {
+						type: String,
+						required: true
+					}
+				};
+			}
+		}
+		class Persons extends ObservableArray {
+			static get items() {
+				return {
+					type: Person
+				};
+			}
+		}
+		try {
+			let array = new Persons(...[{ name: 'Matt' }, { name: 'Kevin' }]);
+			array.splice(1, 1, { name: 'Justin' });
+			assert.deepEqual(array[0].name, 'Matt', "should have Matt");
+			assert.ok(array[1] instanceof Person, "should be an instance of Person");
+			assert.deepEqual(array[1].name, 'Justin', "should have Justin");
+		} catch(e) {
+			assert.notOk(e, "threw :(");
+		}
+	});
 };
