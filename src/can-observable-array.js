@@ -17,11 +17,19 @@ const onKeyValueSymbol = Symbol.for("can.onKeyValue");
 const offKeyValueSymbol = Symbol.for("can.offKeyValue");
 const metaSymbol = Symbol.for("can.meta");
 
+function convertItem (Constructor, item) {
+	if(Constructor.items) {
+		const definition = mixins.normalizeTypeDefinition(Constructor.items.type || Constructor.items);
+		return canReflect.convert(item, definition);
+	}
+	return item;
+}
+
 function convertItems(Constructor, items) {
 	if(items.length) {
 		if(Constructor.items) {
 			for(let i = 0, len = items.length; i < len; i++) {
-				items[i] = canReflect.convert(items[i], Constructor.items);
+				items[i] = convertItem(Constructor, items[i]);
 			}
 		}
 	}
@@ -95,7 +103,7 @@ class ObservableArray extends MixedInArray {
 		for (i = 0, len = args.length - 2; i < len; i++) {
 			listIndex = i + 2;
 			// This should probably be a DefineObject but how?
-			args[listIndex] = canReflect.convert(args[listIndex], this.constructor.items || Object);
+			args[listIndex] = convertItem(this.constructor, args[listIndex]);
 			//args[listIndex] = this.__type(args[listIndex], listIndex);
 			added.push(args[listIndex]);
 

@@ -1,5 +1,6 @@
 const ObservableArray = require("../src/can-observable-array");
 const ObservableObject = require("can-observable-object");
+const type = require("can-type");
 const QUnit = require("steal-qunit");
 
 module.exports = function() {
@@ -9,11 +10,11 @@ module.exports = function() {
 		class Todo extends ObservableObject {}
 		class TodoList extends ObservableArray {
 			static get items() {
-				return Todo;
+				return type.convert(Todo);
 			}
 		}
 
-		let todos = new TodoList([{ label: "Walk the dog" }]);
+		let todos = new TodoList(...[{ label: "Walk the dog" }]);
 		let firstTodo = todos[0];
 
 		assert.ok(firstTodo instanceof Todo, "Item worked");
@@ -23,7 +24,7 @@ module.exports = function() {
 		class Todo extends ObservableObject {}
 		class TodoList extends ObservableArray {
 			static get items() {
-				return Todo;
+				return type.convert(Todo);
 			}
 		}
 
@@ -38,7 +39,7 @@ module.exports = function() {
 		class Todo extends ObservableObject {}
 		class TodoList extends ObservableArray {
 			static get items() {
-				return Todo;
+				return type.convert(Todo);
 			}
 		}
 
@@ -53,7 +54,7 @@ module.exports = function() {
 		class Todo extends ObservableObject {}
 		class TodoList extends ObservableArray {
 			static get items() {
-				return Todo;
+				return type.convert(Todo);
 			}
 		}
 
@@ -85,5 +86,34 @@ module.exports = function() {
 			assert.notOk(e, "threw :(");
 		}
 
+	});
+
+	QUnit.test("#29 items property definition as object", function(assert) {
+		class Person extends ObservableObject {
+			static get props() {
+				return {
+					name: {
+						type: String,
+						required: true
+					}
+				};
+			}
+		}
+		class Persons extends ObservableArray {
+			static get items() {
+				return {
+					type: type.convert(Person)
+				};
+			}
+		}
+		try {
+			let array = new Persons(...[{ name: 'Matt' }, { name: 'Kevin' }]);
+			array.splice(1, 1, { name: 'Justin' });
+			assert.deepEqual(array[0].name, 'Matt', "should have Matt");
+			assert.ok(array[1] instanceof Person, "should be an instance of Person");
+			assert.deepEqual(array[1].name, 'Justin', "should have Justin");
+		} catch(e) {
+			assert.notOk(e, "threw :(");
+		}
 	});
 };
