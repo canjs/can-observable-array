@@ -413,7 +413,7 @@ module.exports = function() {
 	});
 
 	QUnit.test("#30 fix - single argument is undefined", function(assert) {
-		let array = new ObservableArray(...[1]);
-		assert.deepEqual(array, [1], "Has single value");
+		let array = new ObservableArray(...['Single']);
+		assert.deepEqual(array, ['Single'], "Has single value");
 	});
 };
