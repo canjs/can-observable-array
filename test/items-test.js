@@ -1,5 +1,6 @@
 const ObservableArray = require("../src/can-observable-array");
 const ObservableObject = require("can-observable-object");
+const type = require("can-type");
 const QUnit = require("steal-qunit");
 
 module.exports = function() {
@@ -9,11 +10,11 @@ module.exports = function() {
 		class Todo extends ObservableObject {}
 		class TodoList extends ObservableArray {
 			static get items() {
-				return Todo;
+				return type.convert(Todo);
 			}
 		}
 
-		let todos = new TodoList([{ label: "Walk the dog" }]);
+		let todos = new TodoList(...[{ label: "Walk the dog" }]);
 		let firstTodo = todos[0];
 
 		assert.ok(firstTodo instanceof Todo, "Item worked");
@@ -23,7 +24,7 @@ module.exports = function() {
 		class Todo extends ObservableObject {}
 		class TodoList extends ObservableArray {
 			static get items() {
-				return Todo;
+				return type.convert(Todo);
 			}
 		}
 
@@ -38,7 +39,7 @@ module.exports = function() {
 		class Todo extends ObservableObject {}
 		class TodoList extends ObservableArray {
 			static get items() {
-				return Todo;
+				return type.convert(Todo);
 			}
 		}
 
@@ -53,7 +54,7 @@ module.exports = function() {
 		class Todo extends ObservableObject {}
 		class TodoList extends ObservableArray {
 			static get items() {
-				return Todo;
+				return type.convert(Todo);
 			}
 		}
 
@@ -101,7 +102,7 @@ module.exports = function() {
 		class Persons extends ObservableArray {
 			static get items() {
 				return {
-					type: Person
+					type: type.convert(Person)
 				};
 			}
 		}
