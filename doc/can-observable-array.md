@@ -104,7 +104,7 @@ with `new` to create observable lists.  For example:
 
 ```js
 import { ObservableArray } from "can/everything";
-const list = new ObservableArray(...[ "a", "b", "c" ]);
+const list = new ObservableArray( "a", "b", "c" );
 console.log(list[ 0 ]); //-> "a";
 
 list.push( "x" );
@@ -123,7 +123,7 @@ class StringList extends ObservableArray {
   }
 }
 
-const strings = new StringList(...[ 1, new Date( 1475370478173 ), false ]);
+const strings = new StringList( 1, new Date( 1475370478173 ), false );
 
 console.log(strings[ 0 ]); //-> "1"
 console.log(strings[ 1 ]); //-> "Sat Oct 01 2016 20:07:58 GMT-0500 (CDT)"
@@ -150,7 +150,7 @@ class TodoList extends ObservableArray {
   }
 }
 
-const todos = new TodoList(...[ { complete: true }, { complete: false } ]);
+const todos = new TodoList( { complete: true }, { complete: false } );
 console.log(todos.completed.length); //-> 1
 ```
 @codepen
