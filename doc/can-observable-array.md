@@ -104,7 +104,7 @@ with `new` to create observable lists.  For example:
 
 ```js
 import { ObservableArray } from "can/everything";
-const list = new ObservableArray( [ "a", "b", "c" ] );
+const list = new ObservableArray(...[ "a", "b", "c" ]);
 console.log(list[ 0 ]); //-> "a";
 
 list.push( "x" );
@@ -115,15 +115,15 @@ console.log(list.pop()); //-> "x"
 It can also be extended to define custom observable list types with `extends`.  For example, the following defines a `StringList` type where every item is converted to a string by specifying the [can-observable-array/static.items items definition]:
 
 ```js
-import { ObservableObject, type } from "can/everything";
+import { ObservableArray, type } from "can/everything";
 
-class StringList extends ObservableObject {
+class StringList extends ObservableArray {
   static items = {
     type: type.convert(String)
   }
 }
 
-const strings = new StringList( [ 1, new Date( 1475370478173 ), false ] );
+const strings = new StringList(...[ 1, new Date( 1475370478173 ), false ]);
 
 console.log(strings[ 0 ]); //-> "1"
 console.log(strings[ 1 ]); //-> "Sat Oct 01 2016 20:07:58 GMT-0500 (CDT)"
@@ -135,7 +135,6 @@ Non-numeric properties can also be defined on custom ObservableArray type.  The 
 defines a `completed` property that returns the completed todos:
 
 ```js
-import { DefineList, DefineMap } from "can";
 import { ObservableArray, ObservableObject } from "can/everything";
 
 class Todo extends ObservableObject {
@@ -151,12 +150,12 @@ class TodoList extends ObservableArray {
   }
 }
 
-const todos = new TodoList( [ { complete: true }, { complete: false } ] );
+const todos = new TodoList(...[ { complete: true }, { complete: false } ]);
 console.log(todos.completed.length); //-> 1
 ```
 @codepen
 
-Finally, DefineList instances are observable, so you can use the [can-event-queue/map/map]
+Finally, ObservableArray instances are observable, so you can use the [can-event-queue/map/map]
 methods to listen to its [can-observable-array/AddEvent],
 [can-observable-array/LengthEvent], [can-observable-array/RemoveEvent],
 and [can-observable-array/PropertyNameEvent] events:
