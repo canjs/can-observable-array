@@ -15,7 +15,7 @@ module.exports = function() {
 	
 	QUnit.test("Can use type.convert", function(assert) {
 		const ObservableOfArray = ObservableArray.of(type.convert(ObservableObject));
-		const ObservableOf = new ObservableOfArray()
+		const ObservableOf = new ObservableOfArray();
 		ObservableOf.push({ name: 'Matt' });
 
 		assert.deepEqual(ObservableOf.length, 1, 'we have correct length');

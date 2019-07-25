@@ -70,7 +70,7 @@ class ObservableArray extends MixedInArray {
 		} else {
 			ObservableArrayOfClass = class ObservableArrayOfClass extends ObservableArray {
 				static get items () { 
-					return { type };
+					return type;
 				}
 			};
 			// Set the name of the class
