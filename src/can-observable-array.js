@@ -63,7 +63,7 @@ class ObservableArray extends MixedInArray {
 	}
 
 	static of (type) {
-		const name = `ObservableArrayOf${canReflect.getName(type)}`;
+		const name = `ObservableArrayOf<${canReflect.getName(type)}>`;
 		let ObservableArrayOfClass;
 		if (ObservableArrayOfCache.has(type)) {
 			ObservableArrayOfClass = ObservableArrayOfCache.get(type);
@@ -77,7 +77,7 @@ class ObservableArray extends MixedInArray {
 			canReflect.setName(ObservableArrayOfClass, name);
 			ObservableArrayOfCache.set(type, ObservableArrayOfClass);
 		}
-		return new ObservableArrayOfClass();
+		return ObservableArrayOfClass;
 	}
 
 	push(...items) {
