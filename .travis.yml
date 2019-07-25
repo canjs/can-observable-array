@@ -2,9 +2,13 @@ language: node_js
 node_js: node
 services:
   - xvfb
+before_script:
+  - npm run http-server &
+  - sleep 2
 addons:
   firefox: latest
-script: npm test
+  sauce_connect: true
+script: npm run ci
 deploy:
   provider: npm
   email: core@donejs.com

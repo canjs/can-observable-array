@@ -13,6 +13,8 @@
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
+    "http-server": "http-server -p 3000 --silent",
+    "ci": "npm run test && node test/test-saucelabs.js",
     "test": "npm run lint && npm run testee",
     "testee": "testee test.html --browsers firefox"
   },
@@ -32,9 +34,11 @@
   "devDependencies": {
     "can-observable-object": "^0.2.0",
     "can-type": "^0.1.4",
+    "http-server": "^0.11.1",
     "jshint": "^2.9.1",
     "steal": "^2.2.1",
     "steal-qunit": "^2.0.0",
+    "test-saucelabs": "0.0.6",
     "testee": "^0.9.1"
   },
   "dependencies": {
