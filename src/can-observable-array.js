@@ -17,6 +17,8 @@ const onKeyValueSymbol = Symbol.for("can.onKeyValue");
 const offKeyValueSymbol = Symbol.for("can.offKeyValue");
 const metaSymbol = Symbol.for("can.meta");
 
+const ObservableArrayOfCache = new WeakMap();
+
 function convertItem (Constructor, item) {
 	if(Constructor.items) {
 		const definition = mixins.normalizeTypeDefinition(Constructor.items.type || Constructor.items);
@@ -58,6 +60,24 @@ class ObservableArray extends MixedInArray {
 	static [Symbol.for("can.new")](items) {
 		let array = items || [];
 		return new this(...array);
+	}
+
+	static of (type) {
+		const name = `ObservableArrayOf${canReflect.getName(type)}`;
+		let ObservableArrayOfClass;
+		if (ObservableArrayOfCache.has(type)) {
+			ObservableArrayOfClass = ObservableArrayOfCache.get(type);
+		} else {
+			ObservableArrayOfClass = class ObservableArrayOfClass extends ObservableArray {
+				static get items () { 
+					return { type };
+				}
+			};
+			// Set the name of the class
+			canReflect.setName(ObservableArrayOfClass, name);
+			ObservableArrayOfCache.set(type, ObservableArrayOfClass);
+		}
+		return new ObservableArrayOfClass();
 	}
 
 	push(...items) {
