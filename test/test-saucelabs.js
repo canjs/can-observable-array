@@ -4,37 +4,25 @@ var SauceLabs = require('test-saucelabs');
 
 // https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 var platforms = [{
-	browserName: 'internet explorer',
-	platform: 'Windows 7',
-	version: '9'
+	browserName: "safari",
+	platform: "OS X 10.13",
+	version: "11"
 }, {
-	browserName: 'internet explorer',
-	platform: 'Windows 8',
-	version: '10.0'
+	browserName: "MicrosoftEdge",
+	platform: "Windows 10"
 }, {
-	browserName: 'internet explorer',
-	platform: 'Windows 10',
-	version: '11.0'
+	browserName: "firefox",
+	platform: "Windows 10",
+	version: "latest"
 }, {
-	browserName: 'safari',
-	platform: 'OS X 10.11',
-	version: '10.0'
+	browserName: "googlechrome",
+	platform: "Windows 10"
 }, {
-	browserName: 'MicrosoftEdge',
-	platform: 'Windows 10'
-}, {
-	browserName: 'firefox',
-	platform: 'Windows 10',
-	version: '49.0'
-}, {
-	browserName: 'googlechrome',
-	platform: 'Windows 10'
-}, {
-	browserName: 'Safari',
-	'appium-version': '1.6.3',
-	platformName: 'iOS',
-	platformVersion: '10.0',
-	deviceName: 'iPhone 7 Simulator'
+	browserName: "Safari",
+	"appium-version": "1.12.1",
+	platformName: "iOS",
+	platformVersion: "12.2",
+	deviceName: "iPhone XS Simulator"
 }];
 
 var url = 'http://localhost:3000/test.html?hidepassed';
