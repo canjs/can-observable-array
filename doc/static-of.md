@@ -1,11 +1,11 @@
 @property can-observable-array/array.static.of of
 @parent can-observable-array/static
 
-@description Static method to create an ObservableArray.
+@description Static method to create an extended `ObservableArray` where each item is a specific type.
 
 @signature `ObservableArray.of(<TYPE>)`
 
-  Returns an `ObservableArray` constructor which can be used to define the [can-observable-object#Typedproperties Typed properties].
+  Returns an `ObservableArray` constructor with it's static items property set to the `Type` argument. This can be used to define the [can-observable-object#Typedproperties Typed properties].
 
   ```html
   <my-app></my-app>
@@ -21,7 +21,7 @@
   class MyApp extends StacheElement {
     static get props () {
       return {
-        people: ObservableArray.of(type.convert(Person))
+        people: type.convert(ObservableArray.of(type.convert(Person)))
       }
     }
     static view = `
@@ -33,7 +33,7 @@
   customElements.define('my-app', MyApp);
 
   const app = document.querySelector('my-app');
-  app.people.push({ name: 'Matt' });
+  app.people = [{ name: 'Matt' }];
   </script>
   ```
   @codepen
