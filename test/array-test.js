@@ -74,10 +74,10 @@ module.exports = function() {
 	QUnit.test("splice dispatches patches and length events", function(assert) {
 		class Todos extends ObservableArray {}
 
-		let todos = new Todos(
+		let todos = new Todos([
 			{ name: "walk the dog" },
 			{ name: "cook dinner", completed: true }
-		);
+		]);
 
 		let expected = 2, actual = 0;
 
@@ -100,10 +100,10 @@ module.exports = function() {
 	QUnit.test("can.splice dispatches patches and length events", function(assert) {
 		class Todos extends ObservableArray {}
 
-		let todos = new Todos(
+		let todos = new Todos([
 			{ name: "walk the dog" },
 			{ name: "cook dinner", completed: true }
-		);
+		]);
 
 		let expected = 2, actual = 0;
 
@@ -124,13 +124,13 @@ module.exports = function() {
 	});
 
 	QUnit.test("isListLike", function(assert) {
-		let array = new ObservableArray("one", "two");
+		let array = new ObservableArray(["one", "two"]);
 		assert.equal(canReflect.isListLike(array), true, "it is list like");
 
 		class Extended extends ObservableArray {
 		}
 
-		let extended = new Extended("one", "two");
+		let extended = new Extended(["one", "two"]);
 		assert.equal(canReflect.isListLike(extended), true, "It is list like");
 	});
 
@@ -454,5 +454,17 @@ module.exports = function() {
 		let array = new ObservableArray(0, { foo: "bar" });
 		assert.deepEqual(array, [], "Array of no items");
 		assert.equal(array.foo, "bar", "props works");
+	});
+
+	QUnit.test("new ObservableArray(arg) throws if not an array or number", function(assert) {
+		["string", /regexp/, {}, false].forEach(function(arg) {
+			try {
+				let arr = new ObservableArray(arg);
+				assert.notOk(arr, "Unexpected argument" + arg);
+			} catch(e) {
+				assert.ok(true, "Threw, and it was supposed to");
+			}
+
+		});
 	});
 };

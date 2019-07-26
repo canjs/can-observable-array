@@ -44,6 +44,8 @@ class ObservableArray extends MixedInArray {
 		let isLengthArg = typeof items === "number";
 		if(isLengthArg) {
 			super(items);
+		} else if(arguments.length > 0 && !Array.isArray(items)) {
+			throw new Error("can-observable-array: Unexpected argument: " + typeof items);
 		} else {
 			super();
 		}
