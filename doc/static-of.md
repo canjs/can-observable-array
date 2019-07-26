@@ -5,7 +5,7 @@
 
 @signature `ObservableArray.of(<TYPE>)`
 
-  Returns an `ObservableArray` constructor with it's static items property set to the `Type` argument. This can be used to define the [can-observable-object#Typedproperties Typed properties].
+  Returns an `ObservableArray` constructor with its [can-observable-array/static.items static items] property set to the `Type` argument. This can be used to define the [can-observable-object#Typedproperties Typed properties].
 
   ```html
   <my-app></my-app>
