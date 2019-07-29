@@ -39,16 +39,23 @@ const MixedInArray = mixinTypeEvents(mixinMapProps(ProxyArray));
 
 class ObservableArray extends MixedInArray {
 	// TODO define stuff here
-	constructor(...items) {
+	constructor(items, props) {
 		// Arrays can be passed a length like `new Array(15)`
-		let isLengthArg = items.length === 1 && typeof items[0] === "number";
-		if(!isLengthArg) {
-			convertItems(new.target, items);
+		let isLengthArg = typeof items === "number";
+		if(isLengthArg) {
+			super(items);
+		} else if(arguments.length > 0 && !Array.isArray(items)) {
+			throw new Error("can-observable-array: Unexpected argument: " + typeof items);
+		} else {
+			super();
 		}
 
-		super(...items);
-		mixins.finalizeClass(this.constructor);
-		mixins.initialize(this, {});
+		mixins.finalizeClass(new.target);
+		mixins.initialize(this, props || {});
+
+		for(let i = 0, len = items && items.length; i < len; i++) {
+			this[i] = convertItem(new.target, items[i]);
+		}
 	}
 
 	static get [Symbol.species]() {
@@ -57,7 +64,7 @@ class ObservableArray extends MixedInArray {
 
 	static [Symbol.for("can.new")](items) {
 		let array = items || [];
-		return new this(...array);
+		return new this(array);
 	}
 
 	push(...items) {

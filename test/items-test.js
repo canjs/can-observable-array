@@ -14,7 +14,7 @@ module.exports = function() {
 			}
 		}
 
-		let todos = new TodoList(...[{ label: "Walk the dog" }]);
+		let todos = new TodoList([{ label: "Walk the dog" }]);
 		let firstTodo = todos[0];
 
 		assert.ok(firstTodo instanceof Todo, "Item worked");
@@ -107,7 +107,7 @@ module.exports = function() {
 			}
 		}
 		try {
-			let array = new Persons(...[{ name: 'Matt' }, { name: 'Kevin' }]);
+			let array = new Persons([{ name: 'Matt' }, { name: 'Kevin' }]);
 			array.splice(1, 1, { name: 'Justin' });
 			assert.deepEqual(array[0].name, 'Matt', "should have Matt");
 			assert.ok(array[1] instanceof Person, "should be an instance of Person");

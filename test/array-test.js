@@ -1,6 +1,7 @@
 const canReflect = require("can-reflect");
 const ObservableArray = require("../src/can-observable-array");
 const QUnit = require("steal-qunit");
+const type = require("can-type");
 
 module.exports = function() {
 	QUnit.test("Adds proxyability to arrays", function(assert) {
@@ -29,7 +30,7 @@ module.exports = function() {
 	QUnit.test(".filter can be provided an object", function(assert) {
 		class Todos extends ObservableArray {}
 
-		let todos = new Todos(...[
+		let todos = new Todos([
 			{ name: "walk the dog" },
 			{ name: "cook dinner", completed: true }
 		]);
@@ -55,7 +56,7 @@ module.exports = function() {
 	QUnit.test("forEach works", function(assert) {
 		class Todos extends ObservableArray {}
 
-		let todos = new Todos(...[
+		let todos = new Todos([
 			{ name: "walk the dog" },
 			{ name: "cook dinner", completed: true }
 		]);
@@ -73,10 +74,10 @@ module.exports = function() {
 	QUnit.test("splice dispatches patches and length events", function(assert) {
 		class Todos extends ObservableArray {}
 
-		let todos = new Todos(
+		let todos = new Todos([
 			{ name: "walk the dog" },
 			{ name: "cook dinner", completed: true }
-		);
+		]);
 
 		let expected = 2, actual = 0;
 
@@ -99,10 +100,10 @@ module.exports = function() {
 	QUnit.test("can.splice dispatches patches and length events", function(assert) {
 		class Todos extends ObservableArray {}
 
-		let todos = new Todos(
+		let todos = new Todos([
 			{ name: "walk the dog" },
 			{ name: "cook dinner", completed: true }
-		);
+		]);
 
 		let expected = 2, actual = 0;
 
@@ -123,13 +124,13 @@ module.exports = function() {
 	});
 
 	QUnit.test("isListLike", function(assert) {
-		let array = new ObservableArray("one", "two");
+		let array = new ObservableArray(["one", "two"]);
 		assert.equal(canReflect.isListLike(array), true, "it is list like");
 
 		class Extended extends ObservableArray {
 		}
 
-		let extended = new Extended("one", "two");
+		let extended = new Extended(["one", "two"]);
 		assert.equal(canReflect.isListLike(extended), true, "It is list like");
 	});
 
@@ -385,7 +386,7 @@ module.exports = function() {
 			// get the data for the step
 			const { method, args, events, patches, initialData = [] } = step;
 
-			const arr = new Arr(...initialData);
+			const arr = new Arr(initialData);
 			const actualEvents = [], actualPatches = [];
 
 			[0, 1, 2, 3, 5, 6].forEach((index) => {
@@ -409,6 +410,61 @@ module.exports = function() {
 			assert.deepEqual(actualEvents, events, `arr[${method}](${args.join(",")}) dispatched correct events`);
 			assert.deepEqual(actualPatches, patches, `arr[${method}](${args.join(",")}) dispatched correct patches`);
 		});
+	});
 
+	QUnit.test("new ObservableArray([items])", function(assert) {
+		let array = new ObservableArray([1, 2]);
+		assert.deepEqual(array, [1, 2], "Takes an array");
+		array = new ObservableArray([1]);
+		assert.deepEqual(array, [1], "Takes an array of 1 item");
+	});
+
+	QUnit.test("new ExtendedObservableArray(items)", function(assert) {
+		let ExtendedArray = class extends ObservableArray {};
+		let array = new ExtendedArray([1, 2]);
+		assert.deepEqual(array, [1, 2], "Takes an array");
+		array = new ExtendedArray([1]);
+		assert.deepEqual(array, [1], "Takes an array of 1 item");
+	});
+
+	QUnit.test("new ObservableArray(num)", function(assert) {
+		let array = new ObservableArray(10);
+		assert.equal(array.length, 10, "10 items");
+		assert.deepEqual(array, Array.from({ length: 10 }), "Is an item with 10 undefined slots");
+	});
+
+	QUnit.test("new ObservableArray(items, {props})", function(assert) {
+		let array = new ObservableArray([], { foo: "bar" });
+		assert.equal(array.foo, "bar", "Properties are set");
+	});
+
+	QUnit.test("new ExtendedObservableArray(items, {props})", function(assert) {
+		class ExtendedObservableArray extends ObservableArray {
+			static get props() {
+				return {
+					age: type.convert(Number)
+				};
+			}
+		}
+		let array = new ExtendedObservableArray([], { age: "13" });
+		assert.equal(array.age, 13, "Converted works too");
+	});
+
+	QUnit.test("new ObservableArray(num, props)", function(assert) {
+		let array = new ObservableArray(0, { foo: "bar" });
+		assert.deepEqual(array, [], "Array of no items");
+		assert.equal(array.foo, "bar", "props works");
+	});
+
+	QUnit.test("new ObservableArray(arg) throws if not an array or number", function(assert) {
+		["string", /regexp/, {}, false].forEach(function(arg) {
+			try {
+				let arr = new ObservableArray(arg);
+				assert.notOk(arr, "Unexpected argument" + arg);
+			} catch(e) {
+				assert.ok(true, "Threw, and it was supposed to");
+			}
+
+		});
 	});
 };
