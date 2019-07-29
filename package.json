@@ -1,6 +1,6 @@
 {
   "name": "can-observable-array",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "Observable arrays",
   "main": "dist/can-observable-array.js",
   "scripts": {
