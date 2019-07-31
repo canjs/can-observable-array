@@ -469,14 +469,13 @@ module.exports = function() {
 		});
 	});
 
-	QUnit.test("ObservableArray.for(Type) creates a converter type", function(assert) {
+	QUnit.test("ObservableArray.convertsTo(Type) creates a converter type", function(assert) {
 		let Type = class extends ObservableObject {};
-		let type = ObservableArray.for(Type);
+		let type = ObservableArray.convertsTo(Type);
 
 		let array = canReflect.convert([{ one: "one" }, { two: "two" }], type);
 
 		assert.equal(array.length, 2);
 		assert.ok(array[0] instanceof Type, "Each item is of the type");
-
 	});
 };

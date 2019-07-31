@@ -137,9 +137,10 @@ class ObservableArray extends MixedInArray {
 		return removed;
 	}
 
-	static for(Type) {
+	static convertsTo(Type) {
 		const ConvertedType = type.convert(Type);
-		const ArrayType = class extends ObservableArray {
+
+		const ArrayType = class extends this {
 			static get items() {
 				return ConvertedType;
 			}
