@@ -10,6 +10,7 @@ const {
 } = require("./helpers");
 const ProxyArray = require("./proxy-array")();
 const queues = require("can-queues");
+const type = require("can-type");
 
 // symbols aren't enumerable ... we'd need a version of Object that treats them that way
 const localOnPatchesSymbol = "can.patches";
@@ -134,6 +135,21 @@ class ObservableArray extends MixedInArray {
 		var removed = super.splice.apply(this, args);
 		queues.batch.stop();
 		return removed;
+	}
+
+	static convertsTo(Type) {
+		const ConvertedType = type.convert(Type);
+
+		const ArrayType = class extends this {
+			static get items() {
+				return ConvertedType;
+			}
+		};
+
+		const name = `ConvertedObservableArray<${canReflect.getName(Type)}>`;
+		canReflect.setName(ArrayType, name);
+
+		return ArrayType;
 	}
 
 	/* Symbols */
