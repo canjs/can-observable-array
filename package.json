@@ -1,6 +1,10 @@
 {
   "name": "can-observable-array",
+<<<<<<< HEAD
   "version": "1.0.0-pre.0",
+=======
+  "version": "0.8.0",
+>>>>>>> master
   "description": "Observable arrays",
   "main": "dist/can-observable-array.js",
   "scripts": {
@@ -30,22 +34,24 @@
   },
   "homepage": "https://github.com/canjs/can-observable-array#readme",
   "devDependencies": {
-    "can-observable-object": "canjs/can-observable-object#major",
-    "can-type": "^0.1.4",
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "can-observable-object": "^1.0.0-pre.2",
+    "can-type": "^1.0.0-pre.0",
     "jshint": "^2.9.1",
     "steal": "^2.2.1",
     "steal-qunit": "^2.0.0",
     "testee": "^0.9.1"
   },
   "dependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "can-observable-mixin": "canjs/can-observable-mixin#major",
+    "can-observable-mixin": "^1.0.0-pre.1",
     "can-event-queue": "^1.1.6",
+    "can-observable-mixin": "^0.4.3",
     "can-observation-recorder": "^1.3.0",
     "can-queues": "^1.2.2",
-    "can-reflect": "^1.17.10"
+    "can-reflect": "^1.17.10",
+    "can-type": "^0.2.0"
   },
   "browserslist": "ie 11",
   "steal": {

@@ -10,6 +10,7 @@ const {
 } = require("./helpers");
 const ProxyArray = require("./proxy-array")();
 const queues = require("can-queues");
+const type = require("can-type");
 
 // symbols aren't enumerable ... we'd need a version of Object that treats them that way
 const localOnPatchesSymbol = "can.patches";
@@ -17,11 +18,19 @@ const onKeyValueSymbol = Symbol.for("can.onKeyValue");
 const offKeyValueSymbol = Symbol.for("can.offKeyValue");
 const metaSymbol = Symbol.for("can.meta");
 
+function convertItem (Constructor, item) {
+	if(Constructor.items) {
+		const definition = mixins.normalizeTypeDefinition(Constructor.items.type || Constructor.items);
+		return canReflect.convert(item, definition);
+	}
+	return item;
+}
+
 function convertItems(Constructor, items) {
 	if(items.length) {
 		if(Constructor.items) {
 			for(let i = 0, len = items.length; i < len; i++) {
-				items[i] = canReflect.convert(items[i], Constructor.items);
+				items[i] = convertItem(Constructor, items[i]);
 			}
 		}
 	}
@@ -31,16 +40,23 @@ const MixedInArray = mixinTypeEvents(mixinMapProps(ProxyArray));
 
 class ObservableArray extends MixedInArray {
 	// TODO define stuff here
-	constructor(...items) {
+	constructor(items, props) {
 		// Arrays can be passed a length like `new Array(15)`
-		let isLengthArg = items.length === 1 && typeof items[0] === "number";
-		if(!isLengthArg) {
-			convertItems(new.target, items);
+		let isLengthArg = typeof items === "number";
+		if(isLengthArg) {
+			super(items);
+		} else if(arguments.length > 0 && !Array.isArray(items)) {
+			throw new Error("can-observable-array: Unexpected argument: " + typeof items);
+		} else {
+			super();
 		}
 
-		super(...items);
-		mixins.finalizeClass(this.constructor);
-		mixins.initialize(this, {});
+		mixins.finalizeClass(new.target);
+		mixins.initialize(this, props || {});
+
+		for(let i = 0, len = items && items.length; i < len; i++) {
+			this[i] = convertItem(new.target, items[i]);
+		}
 	}
 
 	static get [Symbol.species]() {
@@ -49,7 +65,7 @@ class ObservableArray extends MixedInArray {
 
 	static [Symbol.for("can.new")](items) {
 		let array = items || [];
-		return new this(...array);
+		return new this(array);
 	}
 
 	push(...items) {
@@ -95,7 +111,7 @@ class ObservableArray extends MixedInArray {
 		for (i = 0, len = args.length - 2; i < len; i++) {
 			listIndex = i + 2;
 			// This should probably be a DefineObject but how?
-			args[listIndex] = canReflect.convert(args[listIndex], this.constructor.items || Object);
+			args[listIndex] = convertItem(this.constructor, args[listIndex]);
 			//args[listIndex] = this.__type(args[listIndex], listIndex);
 			added.push(args[listIndex]);
 
@@ -119,6 +135,21 @@ class ObservableArray extends MixedInArray {
 		var removed = super.splice.apply(this, args);
 		queues.batch.stop();
 		return removed;
+	}
+
+	static convertsTo(Type) {
+		const ConvertedType = type.convert(Type);
+
+		const ArrayType = class extends this {
+			static get items() {
+				return ConvertedType;
+			}
+		};
+
+		const name = `ConvertedObservableArray<${canReflect.getName(Type)}>`;
+		canReflect.setName(ArrayType, name);
+
+		return ArrayType;
 	}
 
 	/* Symbols */

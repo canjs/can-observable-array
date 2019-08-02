@@ -11,7 +11,7 @@ Import/require **can-observable-array** and use the Element to derive your own c
 
 ## Documentation
 
-Read the [can-observable-array API docs on CanJS.com](https://v3.canjs.com/doc/can-define-arracan-observable-array the [latest releases on GitHub](https://github.com/canjs/can-observable-array/releases).
+Read the [can-observable-array API docs on CanJS.com](https://canjs.com/doc/can-observable-array) the [latest releases on GitHub](https://github.com/canjs/can-observable-array/releases).
 
 ## Contributing
 
