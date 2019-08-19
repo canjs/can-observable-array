@@ -12,7 +12,7 @@ Returns the a serialized version of this array.
   ```js
   import { ObservableArray } from "can/everything";
 
-  const array = new ObservableArray("first", {foo: "bar"});
+  const array = new ObservableArray(["first", {foo: "bar"}]);
   const serializedArray = array.serialize();
 
   console.log(serializedArray); //-> ["first", {foo: "bar"}]
