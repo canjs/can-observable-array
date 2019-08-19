@@ -8,7 +8,7 @@ Filter an array returning a subset of the items based on a predicate.
   Filter an array of items based on a function predicate.
 
   ```js
-  import { ObservableArray, ObservableObject } from "can/everything";
+  import { ObservableArray, ObservableObject, type } from "can/everything";
 
   class Cartoon extends ObservableObject {
     static props = {
@@ -18,16 +18,16 @@ Filter an array returning a subset of the items based on a predicate.
   }
 
   class Cartoons extends ObservableArray {
-    static items = Cartoon;
+    static items = type.convert(Cartoon);
   }
 
-  let toons = new Cartoons(
+  let toons = new Cartoons([
     { title: "Looney Tunes", studio: "Warner Bros." },
     { title: "Darkwing Duck", studio: "Disney" },
     { title: "Merrie Melodies", studio: "Warner Bros." },
     { title: "Mickey Mouse", studio: "Disney" },
     { title: "The Flintstones", studio: "Hanna-Barbera" }
-  );
+  ]);
 
   let filtered = toons.filter(cartoon => cartoon.title === "The Flintstones");
   console.log( filtered );
@@ -57,13 +57,13 @@ Filter an array returning a subset of the items based on a predicate.
     static items = Cartoon;
   }
 
-  let toons = new Cartoons(
+  let toons = new Cartoons([
     { title: "Looney Tunes", studio: "Warner Bros." },
     { title: "Darkwing Duck", studio: "Disney" },
     { title: "Merrie Melodies", studio: "Warner Bros." },
     { title: "Mickey Mouse", studio: "Disney" },
     { title: "The Flintstones", studio: "Hanna-Barbera" }
-  );
+  ]);
 
   let filtered = toons.filter({ studio: "Warner Bros." });
   console.log( filtered.length ); // -> 2

@@ -11,17 +11,17 @@
   Setting the wildcard is useful when items should be converted to a particular type.
 
   ```js
-import { ObservableArray, ObservableObject } from "can/everything";
+import { ObservableArray, ObservableObject, type } from "can/everything";
 
   class Person extends ObservableObject { /* ... */ }
   class People extends ObservableArray {
-    static items = Person;
+    static items = type.convert(Person);
   }
 
-  let scientists = new People(
+  let scientists = new People([
     { first: "Ada", last: "Lovelace" },
     { first: "John", last: "McCarthy" }
-  );
+  ]);
 
   console.log(scientists[0] instanceof Person);
   // -> true
