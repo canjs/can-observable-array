@@ -14,7 +14,7 @@
   Creates a derived class extending from `ObservableArray`. Useful for creating typed lists to use with associated typed [can-observable-object objects].
 
   ```js
-  import { ObservableArray, ObservableObject } from "can/everything";
+  import { ObservableArray, ObservableObject, type } from "can/everything";
 
   class Todo extends ObservableObject {
     static props = {
@@ -23,13 +23,13 @@
   }
 
   class TodoList extends ObservableArray {
-    static items = Todo;
+    static items = type.convert(Todo);
   }
 
-  let todos = new TodoList(
+  let todos = new TodoList([
     { label: "Walk the dog" },
     { label: "Make dinner" }
-  )
+  ]);
 
   console.log(todos[0] instanceof Todo); // -> true
   ```
@@ -37,7 +37,7 @@
 
   @return {Constructor} An extended `ObservableArray` constructor with definitions from [can-observable-object/object.static.props].
 
-@signature `new ObservableArray(...[items])`
+@signature `new ObservableArray([items])`
 
   Creates an instance of a ObservableArray or an extended ObservableArray with enumerated properties from `items`.
 
@@ -50,7 +50,7 @@
   );
   ```
 
-  @param {*} items Items to be added to the array. If [can-observable-array/static.items] is defined, each item will run through the type converter.
+  @param {Array} items Array of items to be added to the array. If [can-observable-array/static.items] is defined, each item will run through the type converter.
 
   @return {can-observable-array} An instance of `ObservableArray` with the values from _items_.
 
@@ -71,7 +71,7 @@ class MyArray extends ObservableArray {
   static items = String;
 }
 
-const listInstance = new MyArray("a", "b");
+const listInstance = new MyArray(["a", "b"]);
 
 listInstance.on( "length", function( event, newLength, oldLength ) { /* ... */ } );
 ```
@@ -104,11 +104,11 @@ with `new` to create observable lists.  For example:
 
 ```js
 import { ObservableArray } from "can/everything";
-const list = new ObservableArray( "a", "b", "c" );
+const list = new ObservableArray([ "a", "b", "c" ]);
 console.log(list[ 0 ]); //-> "a";
 
 list.push( "x" );
-console.log(list.pop()); //-> "x"
+list.pop(); //-> "x"
 ```
 @codepen
 
@@ -123,7 +123,7 @@ class StringList extends ObservableArray {
   }
 }
 
-const strings = new StringList( 1, new Date( 1475370478173 ), false );
+const strings = new StringList([ 1, new Date( 1475370478173 ), false ]);
 
 console.log(strings[ 0 ]); //-> "1"
 console.log(strings[ 1 ]); //-> "Sat Oct 01 2016 20:07:58 GMT-0500 (CDT)"
@@ -135,7 +135,7 @@ Non-numeric properties can also be defined on custom ObservableArray type.  The 
 defines a `completed` property that returns the completed todos:
 
 ```js
-import { ObservableArray, ObservableObject } from "can/everything";
+import { ObservableArray, ObservableObject, type } from "can/everything";
 
 class Todo extends ObservableObject {
   static props = {
@@ -144,13 +144,13 @@ class Todo extends ObservableObject {
 }
 
 class TodoList extends ObservableArray {
-  static items = Todo;
+  static items = type.convert(Todo);
   get completed() {
     return this.filter( { complete: true } );
   }
 }
 
-const todos = new TodoList( { complete: true }, { complete: false } );
+const todos = new TodoList([ { complete: true }, { complete: false } ]);
 console.log(todos.completed.length); //-> 1
 ```
 @codepen
@@ -162,7 +162,7 @@ and [can-observable-array/PropertyNameEvent] events:
 
 ```js
 import { ObservableArray } from "can/everything";
-const people = new ObservableArray( "alice", "bob", "eve" );
+const people = new ObservableArray([ "alice", "bob", "eve" ]);
 
 people.on( "add", ( ev, items, index ) => {
 	console.log( "add", items, index );

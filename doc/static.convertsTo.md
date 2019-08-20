@@ -11,7 +11,7 @@
   <my-app></my-app>
 
   <script type="module">
-  import { ObservableArray, ObservableObject, StacheElement } from "can/everything";
+  import { ObservableArray, ObservableObject, StacheElement, type } from "can/everything";
 
   class Person extends ObservableObject {
     static props = {
@@ -21,9 +21,7 @@
 
   class MyApp extends StacheElement {
     static props = {
-      return {
-        people: ObservableArray.convertsTo(Person)
-      }
+      people: type.convert( ObservableArray.convertsTo(Person) )
     };
 
     static view = `
