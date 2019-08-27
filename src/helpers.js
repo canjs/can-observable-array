@@ -30,7 +30,13 @@ const helpers = {
 		if (!isNaN(index)) {
 			var itemsDefinition = this._define.definitions["#"];
 			if (how === 'set') {
-				this.dispatch({ type: index }, [ newVal, oldVal ]);
+				this.dispatch({
+					type: index,
+					action: how,
+					key: index,
+					value: newVal,
+					oldValue: oldVal
+				}, [ newVal, oldVal ]);
 
 				// if event is being set through an ObservableArray.prototype method,
 				// do not dispatch length or patch events.
@@ -40,7 +46,7 @@ const helpers = {
 					let patches = [{
 						index: index,
 						deleteCount: 1,
-						insert: [ newVal ],	
+						insert: [ newVal ],
 						type: "splice"
 					}];
 					helpers.dispatchLengthPatch.call(this, how, patches, this.length, this.length);
@@ -50,7 +56,13 @@ const helpers = {
 					ObservationRecorder.ignore(itemsDefinition.added).call(this, newVal, index);
 				}
 
-				this.dispatch({ type: index }, [ newVal, oldVal ]);
+				this.dispatch({
+					type: index,
+					action: how,
+					key: index,
+					value: newVal,
+					oldValue: oldVal
+				}, [ newVal, oldVal ]);
 
 				// if event is being set through an ObservableArray.prototype method,
 				// do not dispatch length or patch events.
@@ -60,7 +72,7 @@ const helpers = {
 					let patches = [{
 						index: index,
 						deleteCount: 0,
-						insert: [ newVal ],	
+						insert: [ newVal ],
 						type: "splice"
 					}];
 					helpers.dispatchLengthPatch.call(this, how, patches, this.length, this.length - 1);
@@ -71,8 +83,13 @@ const helpers = {
 				}
 			}
 		} else {
+			var key = "" + attr;
 			this.dispatch({
-				type: "" + attr,
+				type: key,
+				key: key,
+				action: how,
+				value: newVal,
+				oldValue: oldVal,
 				target: this
 			}, [ newVal, oldVal ]);
 		}
