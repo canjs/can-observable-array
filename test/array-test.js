@@ -478,4 +478,39 @@ module.exports = function() {
 		assert.equal(array.length, 2);
 		assert.ok(array[0] instanceof Type, "Each item is of the type");
 	});
+
+	QUnit.test("value, oldValue, action, key on event object", function(assert) {
+		assert.expect(18);
+
+		let Type = class extends ObservableArray {};
+		let array1 = new Type();
+		let array2 = new ObservableArray();
+
+		for(let array of [array1, array2]) {
+			array.listenTo("prop", (ev) => {
+				assert.equal(ev.action, "add");
+				assert.equal(ev.key, "prop");
+				assert.equal(ev.value, "value");
+			});
+
+			array.prop = "value";
+
+			let first = true;
+			array.listenTo("0", (ev) => {
+				if(first) {
+					first = false;
+					assert.equal(ev.key, "0");
+					assert.equal(ev.value, "value1");
+					assert.equal(ev.oldValue, undefined);
+				} else {
+					assert.equal(ev.key, "0");
+					assert.equal(ev.value, "value2");
+					assert.equal(ev.oldValue, "value1");
+				}
+			});
+
+			array.push("value1");
+			array[0] = "value2";
+		}
+	});
 };
