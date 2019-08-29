@@ -244,15 +244,4 @@ canReflect.eachKey(mutateMethods, function(makePatches, prop) {
 
 makeDefineInstanceKey(ObservableArray);
 
-
-// Export a constructor function to workaround an issue where ES2015 classes
-// cannot be extended in code that's transpiled by Babel.
-function ObservableArrayConstructor() {
-	return Reflect.construct(ObservableArray, arguments, this.constructor);
-}
-
-ObservableArrayConstructor.prototype = Object.create(ObservableArray.prototype);
-ObservableArrayConstructor.prototype.constructor = ObservableArrayConstructor;
-Object.setPrototypeOf(ObservableArrayConstructor, ObservableArray);
-
-module.exports = ObservableArrayConstructor;
+module.exports = ObservableArray;
