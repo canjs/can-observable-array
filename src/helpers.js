@@ -100,6 +100,10 @@ const helpers = {
 	dispatchLengthPatch: function(how, patches, newLength, oldLength) {
 		const dispatchArgs = {
 			type: "length",
+			key: "length",
+			action: how,
+			value: newLength,
+			oldValue: oldLength,
 			patches: patches
 		};
 

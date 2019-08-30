@@ -34,7 +34,10 @@ ComputedObjectObservationData.prototype.unbind = function(){
 ComputedObjectObservationData.prototype.forward = function(newValue, oldValue){
 	mapBindings.dispatch.call(this.instance, {
 		type: this.prop,
-		target: this.instance
+		key: this.prop,
+		target: this.instance,
+		value: newValue,
+		oldValue: oldValue
 
 		// patches: [{
 		// 	key: this.prop,
