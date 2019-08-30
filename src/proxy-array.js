@@ -108,6 +108,9 @@ canReflect.eachKey(mutateMethods, function(makePatches, prop){
 			//!steal-remove-end
 			var dispatchArgs = {
 				type: "length",
+				key: "length",
+				value: meta.target.length,
+				oldValue: oldLength,
 				patches: patches
 			};
 

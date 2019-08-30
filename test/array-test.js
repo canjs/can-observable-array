@@ -480,7 +480,7 @@ module.exports = function() {
 	});
 
 	QUnit.test("value, oldValue, action, key on event object", function(assert) {
-		assert.expect(18);
+		assert.expect(22);
 
 		let Type = class extends ObservableArray {};
 		let array1 = new Type();
@@ -507,6 +507,11 @@ module.exports = function() {
 					assert.equal(ev.value, "value2");
 					assert.equal(ev.oldValue, "value1");
 				}
+			});
+
+			array.listenTo("length", (ev) => {
+				assert.ok("value" in ev);
+				assert.ok("oldValue" in ev);
 			});
 
 			array.push("value1");
