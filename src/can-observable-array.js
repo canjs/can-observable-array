@@ -1,5 +1,6 @@
 const canReflect = require("can-reflect");
 const {
+	createConstructorFunction,
 	makeDefineInstanceKey,
 	mixins,
 	mixinMapProps,
@@ -244,4 +245,6 @@ canReflect.eachKey(mutateMethods, function(makePatches, prop) {
 
 makeDefineInstanceKey(ObservableArray);
 
-module.exports = ObservableArray;
+// Export a constructor function to workaround an issue where ES2015 classes
+// cannot be extended in code that's transpiled by Babel.
+module.exports = createConstructorFunction(ObservableArray);
