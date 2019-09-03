@@ -518,4 +518,12 @@ module.exports = function() {
 			array[0] = "value2";
 		}
 	});
+
+	QUnit.test("Works with list likes", function(assert) {
+		let list = { 0: "one", 1: "two", length: 2 };
+		let array = new ObservableArray(list);
+		assert.equal(array.length, 2, "two items");
+		assert.equal(array[0], "one", "first item");
+		assert.equal(array[1], "two", "second item");
+	});
 };
