@@ -36,6 +36,10 @@ function convertItems(Constructor, items) {
 	}
 }
 
+function isListLike(items) {
+	return canReflect.isListLike(items) && typeof items !== "string";
+}
+
 const MixedInArray = mixinTypeEvents(mixinMapProps(ProxyArray));
 
 class ObservableArray extends MixedInArray {
@@ -45,7 +49,7 @@ class ObservableArray extends MixedInArray {
 		let isLengthArg = typeof items === "number";
 		if(isLengthArg) {
 			super(items);
-		} else if(arguments.length > 0 && !Array.isArray(items)) {
+		} else if(arguments.length > 0 && !isListLike(items)) {
 			throw new Error("can-observable-array: Unexpected argument: " + typeof items);
 		} else {
 			super();
