@@ -35,6 +35,7 @@
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "can-observable-object": "^1.0.0-pre.2",
+    "can-observation": "^4.2.0",
     "jshint": "^2.9.1",
     "steal": "^2.2.1",
     "steal-qunit": "^2.0.0",
