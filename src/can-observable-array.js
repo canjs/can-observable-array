@@ -70,12 +70,12 @@ class ObservableArray extends MixedInArray {
 
 	push(...items) {
 		convertItems(this.constructor, items);
-		super.push(...items);
+		return super.push(...items);
 	}
 
 	unshift(...items) {
 		convertItems(this.constructor, items);
-		super.unshift(...items);
+		return super.unshift(...items);
 	}
 
 	filter(callback) {
@@ -234,11 +234,12 @@ canReflect.eachKey(mutateMethods, function(makePatches, prop) {
 
 		// prevent `length` event from being dispatched by get/set proxy hooks
 		this[metaSymbol].preventSideEffects++;
-		protoFn.apply(this, arguments);
+		const result = protoFn.apply(this, arguments);
 		this[metaSymbol].preventSideEffects--;
 
 		const patches = makePatches(this, Array.from(arguments));
 		dispatchLengthPatch.call(this, prop, patches, this.length, oldLength);
+		return result;
 	};
 });
 

@@ -478,4 +478,55 @@ module.exports = function() {
 		assert.equal(array.length, 2);
 		assert.ok(array[0] instanceof Type, "Each item is of the type");
 	});
+
+	QUnit.test("mutateMethods should return the base method value", function(assert) {
+		const mutateMethods = {
+			"push": {
+				array: [1, 2, 3],
+				args: [4],
+				expected: 4 // the new length
+			},
+			"pop": {
+				array: [1, 2, 3],
+				args: [],
+				expected: 3 // the removed element
+			},
+			"shift": {
+				array: [1, 2, 3],
+				args: [],
+				expected: 1 // the removed element
+			},
+			"unshift": {
+				array: [3, 2, 1],
+				args: [4],
+				expected: 4 // the new length
+			},
+			"splice": {
+				array: [1, 3, 4],
+				args: [1, 0, 2],
+				expected: [], // the removed elements
+			},
+			"sort": {
+				array: [4, 3, 2, 1],
+				args: [],
+				expected: [1, 2, 3, 4], // the sorted array
+			},
+			"reverse": {
+				array: [4, 3, 2, 1],
+				args: [],
+				expected: [1, 2, 3, 4], // the reversed array
+			}
+		};
+
+		Object.keys(mutateMethods).forEach(method => {
+			const { array, args, expected } = mutateMethods[method];
+			const observable = new ObservableArray(array);
+
+			assert.deepEqual(
+				observable[method](...args),
+				expected,
+				`${method} should return expected value`
+			);
+		});
+	});
 };
