@@ -527,15 +527,15 @@ module.exports = function() {
 		assert.equal(array[0], "one", "first item");
 		assert.equal(array[1], "two", "second item");
 	});
-	
+
 	QUnit.test("index events should be fired", function(assert) {
 		const fallback = { name: "fallback" };
 
 		const list = new ObservableArray([
-			{ name: "first" }, 
+			{ name: "first" },
 			{ name: "second" }
 		]);
-		
+
 		const first = new Observation(function() {
 			return list[0] || fallback;
 		});
