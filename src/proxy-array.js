@@ -108,6 +108,9 @@ canReflect.eachKey(mutateMethods, function(makePatches, prop){
 			//!steal-remove-end
 			var dispatchArgs = {
 				type: "length",
+				key: "length",
+				value: meta.target.length,
+				oldValue: oldLength,
 				patches: patches
 			};
 
@@ -174,6 +177,11 @@ const proxyHandlers = {
 		let proxy = proxiedObjects.get(target);
 		ObservationRecorder.add(proxy, key.toString());
 
+		const numberKey = !isSymbolLike(key) && +key;
+		if (Number.isInteger(numberKey)) {
+			ObservationRecorder.add(proxy, "length");
+		}
+		
 		let value = Reflect.get(target, key, receiver);
 		return value;
 	},

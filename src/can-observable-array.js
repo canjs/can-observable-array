@@ -1,5 +1,6 @@
 const canReflect = require("can-reflect");
 const {
+	createConstructorFunction,
 	makeDefineInstanceKey,
 	mixins,
 	mixinMapProps,
@@ -36,6 +37,10 @@ function convertItems(Constructor, items) {
 	}
 }
 
+function isListLike(items) {
+	return canReflect.isListLike(items) && typeof items !== "string";
+}
+
 const MixedInArray = mixinTypeEvents(mixinMapProps(ProxyArray));
 
 class ObservableArray extends MixedInArray {
@@ -45,7 +50,7 @@ class ObservableArray extends MixedInArray {
 		let isLengthArg = typeof items === "number";
 		if(isLengthArg) {
 			super(items);
-		} else if(arguments.length > 0 && !Array.isArray(items)) {
+		} else if(arguments.length > 0 && !isListLike(items)) {
 			throw new Error("can-observable-array: Unexpected argument: " + typeof items);
 		} else {
 			super();
@@ -245,4 +250,6 @@ canReflect.eachKey(mutateMethods, function(makePatches, prop) {
 
 makeDefineInstanceKey(ObservableArray);
 
-module.exports = ObservableArray;
+// Export a constructor function to workaround an issue where ES2015 classes
+// cannot be extended in code that's transpiled by Babel.
+module.exports = createConstructorFunction(ObservableArray);

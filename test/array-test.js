@@ -1,4 +1,5 @@
 const canReflect = require("can-reflect");
+const Observation = require("can-observation");
 const ObservableArray = require("../src/can-observable-array");
 const ObservableObject = require("can-observable-object");
 const QUnit = require("steal-qunit");
@@ -477,6 +478,90 @@ module.exports = function() {
 
 		assert.equal(array.length, 2);
 		assert.ok(array[0] instanceof Type, "Each item is of the type");
+	});
+
+	QUnit.test("value, oldValue, action, key on event object", function(assert) {
+		assert.expect(22);
+
+		let Type = class extends ObservableArray {};
+		let array1 = new Type();
+		let array2 = new ObservableArray();
+
+		for(let array of [array1, array2]) {
+			array.listenTo("prop", (ev) => {
+				assert.equal(ev.action, "add");
+				assert.equal(ev.key, "prop");
+				assert.equal(ev.value, "value");
+			});
+
+			array.prop = "value";
+
+			let first = true;
+			array.listenTo("0", (ev) => {
+				if(first) {
+					first = false;
+					assert.equal(ev.key, "0");
+					assert.equal(ev.value, "value1");
+					assert.equal(ev.oldValue, undefined);
+				} else {
+					assert.equal(ev.key, "0");
+					assert.equal(ev.value, "value2");
+					assert.equal(ev.oldValue, "value1");
+				}
+			});
+
+			array.listenTo("length", (ev) => {
+				assert.ok("value" in ev);
+				assert.ok("oldValue" in ev);
+			});
+
+			array.push("value1");
+			array[0] = "value2";
+		}
+	});
+
+	QUnit.test("Works with list likes", function(assert) {
+		let list = { 0: "one", 1: "two", length: 2 };
+		let array = new ObservableArray(list);
+		assert.equal(array.length, 2, "two items");
+		assert.equal(array[0], "one", "first item");
+		assert.equal(array[1], "two", "second item");
+	});
+
+	QUnit.test("index events should be fired", function(assert) {
+		const fallback = { name: "fallback" };
+
+		const list = new ObservableArray([
+			{ name: "first" },
+			{ name: "second" }
+		]);
+
+		const first = new Observation(function() {
+			return list[0] || fallback;
+		});
+
+		const second = new Observation(function() {
+			return list[1] || fallback;
+		});
+
+		// bind the observations
+		const noop = () => {};
+		canReflect.onValue(first, noop);
+		canReflect.onValue(second, noop);
+
+		// check initial values
+		assert.equal(canReflect.getValue(first).name, "first");
+		assert.equal(canReflect.getValue(second).name, "second");
+
+		// mutate the list
+		list.shift();
+		assert.equal(canReflect.getValue(first).name, "second");
+		assert.equal(canReflect.getValue(second).name, "fallback");
+
+		// mutate the list again
+		list.shift();
+		assert.equal(canReflect.getValue(first).name, "fallback");
+		assert.equal(canReflect.getValue(second).name, "fallback");
 	});
 
 	QUnit.test("mutateMethods should return the base method value", function(assert) {
