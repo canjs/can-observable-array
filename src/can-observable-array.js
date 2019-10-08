@@ -9,6 +9,7 @@ const {
 const {
 	dispatchLengthPatch
 } = require("./helpers");
+const namespace = require("can-namespace");
 const ProxyArray = require("./proxy-array")();
 const queues = require("can-queues");
 const type = require("can-type");
@@ -252,4 +253,6 @@ makeDefineInstanceKey(ObservableArray);
 
 // Export a constructor function to workaround an issue where ES2015 classes
 // cannot be extended in code that's transpiled by Babel.
-module.exports = createConstructorFunction(ObservableArray);
+module.exports = namespace.ObservableArray = createConstructorFunction(
+	ObservableArray
+);
