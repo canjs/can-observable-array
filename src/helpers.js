@@ -1,4 +1,5 @@
 const canReflect = require("can-reflect");
+const { mixins } = require("can-observable-mixin");
 const ObservationRecorder = require("can-observation-recorder");
 const mapBindings = require("can-event-queue/map/map");
 const metaSymbol = Symbol.for("can.meta");
@@ -114,6 +115,24 @@ const helpers = {
 		//!steal-remove-end
 
 		mapBindings.dispatch.call(this, dispatchArgs, [newLength, oldLength]);
+	},
+
+	convertItem: function(Constructor, item) {
+		if(Constructor.items) {
+			const definition = mixins.normalizeTypeDefinition(Constructor.items.type || Constructor.items);
+			return canReflect.convert(item, definition);
+		}
+		return item;
+	},
+
+	convertItems: function(Constructor, items) {
+		if(items.length) {
+			if(Constructor.items) {
+				for(let i = 0, len = items.length; i < len; i++) {
+					items[i] = helpers.convertItem(Constructor, items[i]);
+				}
+			}
+		}
 	}
 };
 

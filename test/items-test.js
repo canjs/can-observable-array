@@ -116,4 +116,21 @@ module.exports = function() {
 			assert.notOk(e, "threw :(");
 		}
 	});
+
+	QUnit.test("#67 Setting an item at an index", function(assert) {
+		class MyObject extends ObservableObject {}
+		class MyArray extends ObservableArray {
+			static get items() {
+				return type.convert(MyObject);
+			}
+		}
+
+		let arr = new MyArray();
+		arr.push({ num: 5 });
+
+		assert.ok(arr[0] instanceof MyObject, "Converts on a push");
+
+		arr[0] = { num: 6 };
+		assert.ok(arr[0] instanceof MyObject, "Converts on an index setter");
+	});
 };
