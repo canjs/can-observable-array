@@ -7,6 +7,8 @@ const {
 	mixinTypeEvents
 } = require("can-observable-mixin");
 const {
+	convertItem,
+	convertItems,
 	dispatchLengthPatch
 } = require("./helpers");
 const namespace = require("can-namespace");
@@ -19,24 +21,6 @@ const localOnPatchesSymbol = "can.patches";
 const onKeyValueSymbol = Symbol.for("can.onKeyValue");
 const offKeyValueSymbol = Symbol.for("can.offKeyValue");
 const metaSymbol = Symbol.for("can.meta");
-
-function convertItem (Constructor, item) {
-	if(Constructor.items) {
-		const definition = mixins.normalizeTypeDefinition(Constructor.items.type || Constructor.items);
-		return canReflect.convert(item, definition);
-	}
-	return item;
-}
-
-function convertItems(Constructor, items) {
-	if(items.length) {
-		if(Constructor.items) {
-			for(let i = 0, len = items.length; i < len; i++) {
-				items[i] = convertItem(Constructor, items[i]);
-			}
-		}
-	}
-}
 
 function isListLike(items) {
 	return canReflect.isListLike(items) && typeof items !== "string";

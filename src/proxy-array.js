@@ -4,8 +4,9 @@ const mapBindings = require("can-event-queue/map/map");
 const ObservationRecorder = require("can-observation-recorder");
 const {
 	assignNonEnumerable,
-	shouldRecordObservationOnAllKeysExceptFunctionsOnProto,
-	dispatchIndexEvent
+	convertItem,
+	dispatchIndexEvent,
+	shouldRecordObservationOnAllKeysExceptFunctionsOnProto
 } = require("./helpers");
 const { mixins } = require("can-observable-mixin");
 
@@ -154,13 +155,19 @@ function setValueAndOnChange(key, value, target, proxy, onChange) {
 		old = target[key];
 		change = old !== value;
 		if (change) {
-			let keyIsString = typeof key === "string";
+			let keyType = typeof key;
+			let keyIsString = keyType === "string";
 
 			// String keys added to the instance (and is not "length")
 			// Are newly defined properties and have propertyDefaults provided.
 			if(keyIsString && !(key in target)) {
 				mixins.expando(target, key, value);
 			} else {
+				// arr[0] = { foo: 'bar' } should convert to MyArray.items
+				if(keyType === "number") {
+					value = convertItem(target.constructor, value);
+				}
+
 				target[key] = value;
 				onChange(hadOwn, old);
 			}
