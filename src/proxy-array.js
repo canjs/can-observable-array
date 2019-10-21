@@ -229,9 +229,13 @@ const proxyHandlers = {
 	ownKeys() {
 		ObservationRecorder.add(this.proxy, "can.keys");
 
-		return Object.getOwnPropertyNames(this.target)
-			.concat(Object.getOwnPropertySymbols(this.target))
-			.concat(Object.getOwnPropertySymbols(this.proxyKeys));
+		let keysSet = new Set(
+			Object.getOwnPropertyNames(this.target)
+				.concat(Object.getOwnPropertySymbols(this.target))
+				.concat(Object.getOwnPropertySymbols(this.proxyKeys))
+		);
+
+		return Array.from(keysSet);
 	}
 };
 
