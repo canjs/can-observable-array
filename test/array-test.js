@@ -73,6 +73,22 @@ module.exports = function() {
 		assert.equal(actual, expected, "Looped over each item");
 	});
 
+	QUnit.test("for...in works", function(assert) {
+		class Todos extends ObservableArray {}
+
+		let todos = new Todos([
+			{ name: "walk the dog" },
+			{ name: "cook dinner", completed: true }
+		]);
+
+		let props = [];
+		for (let prop in todos) {
+			props.push(prop);
+		}
+
+		assert.ok(props, "for...in should not throw");
+	});
+
 	QUnit.test("splice dispatches patches and length events", function(assert) {
 		class Todos extends ObservableArray {}
 
