@@ -152,6 +152,56 @@ module.exports = function() {
 		assert.equal(canReflect.isListLike(extended), true, "It is list like");
 	});
 
+	QUnit.test("getOwnKeys", function(assert) {
+		let empty = new ObservableArray();
+		assert.deepEqual(canReflect.getOwnKeys(empty), []);
+
+		let array = new ObservableArray([1, 2, 3]);
+		assert.deepEqual(canReflect.getOwnKeys(array), ["0", "1", "2"]);
+
+		class Extended extends ObservableArray {
+			static get props() {
+				return {
+					get computed() {
+						return "a computed property";
+					}
+				};
+			}
+		}
+
+		let extended = new Extended([1, 2, 3]);
+		assert.deepEqual(
+			canReflect.getOwnKeys(extended),
+			["0", "1", "2", "computed"],
+			"should include non-enumerables"
+		);
+	});
+
+	QUnit.test("getOwnEnumerableKeys", function(assert) {
+		let empty = new ObservableArray();
+		assert.deepEqual(canReflect.getOwnEnumerableKeys(empty), []);
+
+		let array = new ObservableArray([1, 2, 3]);
+		assert.deepEqual(canReflect.getOwnEnumerableKeys(array), ["0", "1", "2"]);
+
+		class Extended extends ObservableArray {
+			static get props() {
+				return {
+					get computed() {
+						return "a computed property";
+					}
+				};
+			}
+		}
+
+		let extended = new Extended([1, 2, 3]);
+		assert.deepEqual(
+			canReflect.getOwnEnumerableKeys(extended),
+			["0", "1", "2"],
+			"should NOT include non-enumerables"
+		);
+	});
+	
 	QUnit.test("push dispatches patches and length events", function(assert) {
 		class Hobbies extends ObservableArray {}
 		const hobbies = new Hobbies();
