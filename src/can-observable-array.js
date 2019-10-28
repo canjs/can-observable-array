@@ -158,6 +158,12 @@ class ObservableArray extends MixedInArray {
 	get [Symbol.for("can.isListLike")]() {
 		return true;
 	}
+
+	[Symbol.for("can.getOwnEnumerableKeys")]() {
+		let base = super[Symbol.for("can.getOwnEnumerableKeys")]();
+		let keysSet = new Set([...Object.keys(this), ...base]);
+		return Array.from(keysSet);
+	}
 }
 
 var mutateMethods = {
