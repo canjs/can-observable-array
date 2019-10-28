@@ -161,7 +161,7 @@ class ObservableArray extends MixedInArray {
 
 	[Symbol.for("can.getOwnEnumerableKeys")]() {
 		let base = super[Symbol.for("can.getOwnEnumerableKeys")]();
-		let keysSet = new Set([...base, ...Object.keys(this)]);
+		let keysSet = new Set([...Object.keys(this), ...base]);
 		return Array.from(keysSet);
 	}
 }

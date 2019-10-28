@@ -159,6 +159,23 @@ module.exports = function() {
 		let array = new ObservableArray([1, 2, 3]);
 		assert.deepEqual(canReflect.getOwnKeys(array), ["0", "1", "2"]);
 
+		class EnumerableComputed extends ObservableArray {
+			static get props() {
+				return {
+					computed: {
+						enumerable: true,
+						default: "a computed property"
+					}
+				};
+			}
+		}
+		let enumerable = new EnumerableComputed([1, 2, 3]);
+		assert.deepEqual(
+			canReflect.getOwnKeys(enumerable),
+			["0", "1", "2", "computed"],
+			"should include enumerables"
+		);
+
 		class Extended extends ObservableArray {
 			static get props() {
 				return {
@@ -168,7 +185,6 @@ module.exports = function() {
 				};
 			}
 		}
-
 		let extended = new Extended([1, 2, 3]);
 		assert.deepEqual(
 			canReflect.getOwnKeys(extended),
@@ -198,6 +214,23 @@ module.exports = function() {
 		assert.deepEqual(
 			canReflect.getOwnEnumerableKeys(extended),
 			["0", "1", "2"],
+			"should NOT include non-enumerables"
+		);
+
+		class EnumerableComputed extends ObservableArray {
+			static get props() {
+				return {
+					computed: {
+						enumerable: true,
+						default: "a computed property"
+					}
+				};
+			}
+		}
+		let enumerable = new EnumerableComputed([1, 2, 3]);
+		assert.deepEqual(
+			canReflect.getOwnEnumerableKeys(enumerable),
+			["0", "1", "2", "computed"],
 			"should NOT include non-enumerables"
 		);
 	});
