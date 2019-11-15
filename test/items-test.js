@@ -2,6 +2,7 @@ const ObservableArray = require("../src/can-observable-array");
 const ObservableObject = require("can-observable-object");
 const type = require("can-type");
 const QUnit = require("steal-qunit");
+const canReflect = require("can-reflect");
 
 module.exports = function() {
 	QUnit.module("ExtendedObservableArray.items");
@@ -132,5 +133,22 @@ module.exports = function() {
 
 		arr[0] = { num: 6 };
 		assert.ok(arr[0] instanceof MyObject, "Converts on an index setter");
+	});
+
+	QUnit.test("patches dispatched with converted members", function (assert) {
+		assert.expect(2);
+		const ObserveType = class extends ObservableObject {};
+		const TypedArray = class extends ObservableArray {
+			static get items() {
+				return type.convert(ObserveType);
+			}
+		};
+		const observable = new TypedArray([]);
+		canReflect.onPatches(observable, function(patches) {
+			assert.ok(patches[0].insert[0] instanceof ObserveType, "type is correct");
+			assert.deepEqual(patches[0].insert[0].get(), {foo: "bar"}, "props copied over");
+		});
+
+		observable.push({ foo: "bar" });
 	});
 };
