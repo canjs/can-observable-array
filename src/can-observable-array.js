@@ -59,12 +59,10 @@ class ObservableArray extends MixedInArray {
 	}
 
 	push(...items) {
-		convertItems(this.constructor, items);
 		return super.push(...items);
 	}
 
 	unshift(...items) {
-		convertItems(this.constructor, items);
 		return super.unshift(...items);
 	}
 
@@ -100,9 +98,6 @@ class ObservableArray extends MixedInArray {
 		// converting the arguments to the right type
 		for (i = 0, len = args.length - 2; i < len; i++) {
 			listIndex = i + 2;
-			// This should probably be a DefineObject but how?
-			args[listIndex] = convertItem(this.constructor, args[listIndex]);
-			//args[listIndex] = this.__type(args[listIndex], listIndex);
 			added.push(args[listIndex]);
 
 			// Now lets check if anything will change
@@ -223,17 +218,33 @@ var mutateMethods = {
 	}
 };
 
+const convertArgs = {
+	"push": function(arr, args) {
+		return convertItems(arr.constructor, args);
+	},
+	"unshift": function(arr, args) {
+		return convertItems(arr.constructor, args);
+	},
+	"splice": function(arr, args) {
+		return args.slice(0, 2).concat(convertItems(arr.constructor, args.slice(2)));
+	}
+};
+
 canReflect.eachKey(mutateMethods, function(makePatches, prop) {
 	const protoFn = ObservableArray.prototype[prop];
 	ObservableArray.prototype[prop] = function() {
 		const oldLength = this.length;
+		let args = Array.from(arguments);
+		if(convertArgs[prop]) {
+			args = convertArgs[prop](this, args);
+		}
 
 		// prevent `length` event from being dispatched by get/set proxy hooks
 		this[metaSymbol].preventSideEffects++;
-		const result = protoFn.apply(this, arguments);
+		const result = protoFn.apply(this, args);
 		this[metaSymbol].preventSideEffects--;
 
-		const patches = makePatches(this, Array.from(arguments));
+		const patches = makePatches(this, args);
 		dispatchLengthPatch.call(this, prop, patches, this.length, oldLength);
 		return result;
 	};
