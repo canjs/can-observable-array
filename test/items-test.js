@@ -151,4 +151,43 @@ module.exports = function() {
 
 		observable.push({ foo: "bar" });
 	});
+
+	QUnit.test("Mutate methods patches dispatched with converted members", function (assert) {
+		var testSteps = [
+			{
+				method: 'push',
+				args: [{foo: 'bar'}]
+			},
+			{
+				method: 'unshift',
+				args: [{foo: 'bar'}]
+			},
+			{
+				method: 'splice',
+				args: [0, 0, {foo: 'bar'}]
+			}
+		];
+		const AType = class extends ObservableObject {};
+		const ATypedArray = class extends ObservableArray {
+			static get items() {
+				return type.convert(AType);
+			}
+		};
+
+		testSteps.forEach((step) => {
+			const { method, args, initialData = [] } = step;
+			
+			const aTypedList = new ATypedArray(initialData);
+
+			canReflect.onPatches(aTypedList, function(patches) {
+				assert.ok(patches[0].insert[0] instanceof AType, "type is correct");
+				assert.deepEqual(patches[0].insert[0].get(), {foo: "bar"}, "props copied over");
+				assert.ok(true);
+			});
+	
+			aTypedList[method].apply(aTypedList, args);
+
+		});
+
+	});
 };
