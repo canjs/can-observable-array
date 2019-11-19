@@ -136,7 +136,7 @@ module.exports = function() {
 	});
 
 	QUnit.test("patches dispatched with converted members", function (assert) {
-		assert.expect(2);
+		assert.expect(6);
 		const ObserveType = class extends ObservableObject {};
 		const TypedArray = class extends ObservableArray {
 			static get items() {
@@ -150,6 +150,8 @@ module.exports = function() {
 		});
 
 		observable.push({ foo: "bar" });
+		observable.unshift({ foo: "bar" });
+		observable.splice(2, 0, { foo: "bar" });
 	});
 
 	QUnit.test("Mutate methods patches dispatched with converted members", function (assert) {
