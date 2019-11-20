@@ -713,4 +713,26 @@ module.exports = function() {
 			);
 		});
 	});
+
+	QUnit.test("mutateMethods should dispatch patches with correct deleteCount when array is empty", function(assert) {
+		const testSteps = [
+			{ method: "splice", args: [ 0, 1 ] },
+			{ method: "pop", args: [] },
+			{ method: "shift", args: [] }
+		];
+
+		testSteps.forEach((step) => {
+			const { method, args, initialData = [] } = step;
+
+			const arr = new ObservableArray(initialData);
+
+			canReflect.onPatches(arr, (patches) => {
+				patches.forEach((patch) => {
+					assert.equal(patch.deleteCount, 0, `calling ${method} on an empty array returned correct deleteCount`);
+				});
+			});
+
+			arr[method].apply(arr, args);
+		});
+	});
 };
