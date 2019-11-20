@@ -713,4 +713,40 @@ module.exports = function() {
 			);
 		});
 	});
+
+	QUnit.test("mutateMethods should dispatch patches with correct index/deleteCount when array is too short", function(assert) {
+		const testSteps = [
+			{ method: "splice", args: [ 0, 1 ] },
+			{ method: "pop", args: [] },
+			{ method: "shift", args: [] },
+			{ method: "splice", args: [ 1, 4 ], initialData: [ 1, 2, 3, 4 ], deleteCount: 3 },
+			{ method: "splice", args: [ 3, 4 ], initialData: [ 1, 2 ], index: 2 },
+			{ method: "splice", args: [ -1, 4 ], initialData: [ 1, 2 ], index: 1, deleteCount: 1 },
+			{ method: "splice", args: [ 1, -4 ], initialData: [ 1, 2 ], index: 1, deleteCount: 0 },
+		];
+
+		testSteps.forEach((step) => {
+			const { method, args, initialData = [], deleteCount = 0 } = step;
+			const index = step.index != null ? step.index : args[0] || 0;
+
+			const arr = new ObservableArray(initialData);
+
+			canReflect.onPatches(arr, (patches) => {
+				patches.forEach((patch) => {
+					assert.equal(
+						patch.deleteCount,
+						deleteCount,
+						`calling ${method} returned correct deleteCount`
+					);
+					assert.equal(
+						patch.index,
+						index,
+						`calling ${method} returned correct index`
+					);
+				});
+			});
+
+			arr[method].apply(arr, args);
+		});
+	});
 };

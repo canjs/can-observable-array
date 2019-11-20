@@ -170,17 +170,17 @@ var mutateMethods = {
 			type: "splice"
 		}];
 	},
-	"pop": function(arr) {
+	"pop": function(arr, args, oldLength) {
 		return [{
 			index: arr.length,
-			deleteCount: 1,
+			deleteCount: oldLength > 0 ? 1 : 0,
 			type: "splice"
 		}];
 	},
-	"shift": function() {
+	"shift": function(arr, args, oldLength) {
 		return [{
 			index: 0,
-			deleteCount: 1,
+			deleteCount: oldLength > 0 ? 1 : 0,
 			type: "splice"
 		}];
 	},
@@ -192,10 +192,13 @@ var mutateMethods = {
 			type: "splice"
 		}];
 	},
-	"splice": function(arr, args) {
+	"splice": function(arr, args, oldLength) {
+		const index = args[0] < 0 ?
+			Math.max(oldLength + args[0], 0) :
+			Math.min(oldLength, args[0]);
 		return [{
-			index: args[0],
-			deleteCount: args[1],
+			index,
+			deleteCount: Math.max(0, Math.min(args[1], oldLength - index)),
 			insert: args.slice(2),
 			type: "splice"
 		}];
@@ -244,7 +247,7 @@ canReflect.eachKey(mutateMethods, function(makePatches, prop) {
 		const result = protoFn.apply(this, args);
 		this[metaSymbol].preventSideEffects--;
 
-		const patches = makePatches(this, args);
+		const patches = makePatches(this, args, oldLength);
 		dispatchLengthPatch.call(this, prop, patches, this.length, oldLength);
 		return result;
 	};
