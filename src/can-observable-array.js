@@ -193,9 +193,12 @@ var mutateMethods = {
 		}];
 	},
 	"splice": function(arr, args, oldLength) {
+		const index = args[0] < 0 ?
+			Math.max(oldLength + args[0], 0) :
+			Math.min(oldLength, args[0]);
 		return [{
-			index: args[0],
-			deleteCount: args[1] > oldLength ? oldLength : args[1],
+			index,
+			deleteCount: Math.max(0, Math.min(args[1], oldLength - index)),
 			insert: args.slice(2),
 			type: "splice"
 		}];
