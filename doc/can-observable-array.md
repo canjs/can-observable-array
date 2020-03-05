@@ -92,9 +92,12 @@ class MyArray extends ObservableArray {
   static items = String;
 }
 
-canReflect.onInstancePatches( MyList, ( instance, patches ) => {
+canReflect.onInstancePatches( MyArray, ( instance, patches ) => {
+  console.log(patches, instance);
+});
 
-} );
+people.pop(); // [{index:2, deleteCount:1, type:'splice'}] ["alice", "bob"]
+people.unshift( "Xerxes" ); // [{index:0, deleteCount:0, insert':['Xerxes'], type':'splice'}] ["Xerxes", "alice", "bob"]
 ```
 
 ## Using
@@ -152,30 +155,5 @@ class TodoList extends ObservableArray {
 
 const todos = new TodoList([ { complete: true }, { complete: false } ]);
 console.log(todos.completed.length); //-> 1
-```
-@codepen
-
-Finally, ObservableArray instances are observable, so you can use the [can-event-queue/map/map]
-methods to listen to its [can-observable-array/AddEvent],
-[can-observable-array/LengthEvent], [can-observable-array/RemoveEvent],
-and [can-observable-array/PropertyNameEvent] events:
-
-```js
-import { ObservableArray } from "can/everything";
-const people = new ObservableArray([ "alice", "bob", "eve" ]);
-
-people.on( "add", ( ev, items, index ) => {
-	console.log( "add", items, index );
-} ).on( "remove", ( ev, items, index ) => {
-	console.log( "remove", items, index );
-} ).on( "length", ( ev, newVal, oldVal ) => {
-	console.log( "length", newVal, oldVal );
-} );
-
-people.pop(); // remove ["eve"] 2
-// length 2 3
-
-people.unshift( "Xerxes" ); // add ["Xerxes"] 1
-// length 3 2
 ```
 @codepen
