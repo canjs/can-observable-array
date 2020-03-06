@@ -99,6 +99,7 @@ canReflect.onInstancePatches( MyArray, ( instance, patches ) => {
 people.pop(); // [{index:2, deleteCount:1, type:'splice'}] ["alice", "bob"]
 people.unshift( "Xerxes" ); // [{index:0, deleteCount:0, insert':['Xerxes'], type':'splice'}] ["Xerxes", "alice", "bob"]
 ```
+@codepen
 
 ## Using
 
