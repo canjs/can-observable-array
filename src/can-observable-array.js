@@ -47,6 +47,32 @@ class ObservableArray extends MixedInArray {
 		for(let i = 0, len = items && items.length; i < len; i++) {
 			this[i] = convertItem(new.target, items[i]);
 		}
+		const obj = this;
+		// Define class fields observables 
+		//and return the proxy
+		return new Proxy(this, {
+			defineProperty(target, prop, descriptor) {
+				if ('items' === prop) {
+					throw new Error('ObservableArray does not support a class field named items. Try using a different name or using static items');
+				}
+				
+				const props = target.constructor.props;
+				let value = descriptor.value;
+
+				if (!value && typeof descriptor.get === 'function') {
+					value = descriptor.get();
+				}
+
+				if (value) {
+					if (props && props[prop]) {
+						obj[prop] = value;
+						return true;
+					}
+					// Make the property observable
+					return mixins.expando(target, prop, value);
+				}
+			}
+		});
 	}
 
 	static get [Symbol.species]() {
