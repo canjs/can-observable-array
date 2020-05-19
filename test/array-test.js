@@ -749,4 +749,40 @@ module.exports = function() {
 			arr[method].apply(arr, args);
 		});
 	});
+
+	QUnit.test('Dispatch events for mutation with 0 integer value', function (assert) {
+		assert.expect(2);
+		const order = new ObservableArray([0, 1]);
+
+		canReflect.onPatches(order, (patches) => {
+			assert.equal(patches[0].index, 1);
+			assert.equal(order[1], 0);
+		});
+		order[1] = 0;
+	});
+
+	QUnit.test('Dispatch events after swapping items that have 0 value', function (assert) {
+		assert.expect(2);
+		const order = new ObservableArray([0, 1]);
+
+		const first = new Observation(function() {
+			return order[0];
+		});
+
+		const second = new Observation(function() {
+			return order[1];
+		});
+
+		canReflect.onValue(first, function () {
+			assert.equal(1, order[0]);
+		});
+
+		canReflect.onValue(second, function () {
+			assert.equal(0, order[1]);
+		});
+
+		const tmp = order[0];
+		order[0] = order[1];
+		order[1] = tmp;
+	});
 };

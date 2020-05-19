@@ -207,7 +207,7 @@ const proxyHandlers = {
 				dispatchIndexEvent.call(
 					receiver,
 					key,
-					hadOwn ? (newValue ? "set" : "remove") : "add",
+					hadOwn ? (typeof newValue !== 'undefined' ? "set" : "remove") : "add",
 					newValue,
 					oldValue
 				);
