@@ -580,7 +580,7 @@ module.exports = function() {
 	});
 
 	QUnit.test("value, oldValue, action, key on event object", function(assert) {
-		assert.expect(22);
+		assert.expect(26);
 
 		let Type = class extends ObservableArray {};
 		let array1 = new Type();
@@ -784,5 +784,18 @@ module.exports = function() {
 		const tmp = order[0];
 		order[0] = order[1];
 		order[1] = tmp;
+	});
+
+	QUnit.test('metaSymbol preventSideEffects should allow array mutation functions', function(assert) {
+		assert.expect(2);
+		const myList = new ObservableArray([0,1]);
+		myList.push("I am going to hide some changes.");
+		
+		canReflect.onPatches(myList, function (patches) {
+			assert.equal(patches[0].index, 1);
+			assert.equal(patches[0].insert[0], 'Patched after push');
+		});
+		
+		myList[1] = "Patched after push";
 	});
 };
