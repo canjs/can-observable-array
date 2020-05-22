@@ -43,7 +43,6 @@ class ObservableArray extends MixedInArray {
 
 		mixins.finalizeClass(new.target);
 		mixins.initialize(this, props || {});
-		this[metaSymbol].preventSideEffects = 0;
 		
 		for(let i = 0, len = items && items.length; i < len; i++) {
 			this[i] = convertItem(new.target, items[i]);
@@ -244,7 +243,7 @@ canReflect.eachKey(mutateMethods, function(makePatches, prop) {
 		}
 
 		// prevent `length` event from being dispatched by get/set proxy hooks
-		this[metaSymbol].preventSideEffects++;
+		this[metaSymbol].preventSideEffects = (this[metaSymbol].preventSideEffects || 0) + 1;
 		const result = protoFn.apply(this, args);
 		this[metaSymbol].preventSideEffects--;
 
