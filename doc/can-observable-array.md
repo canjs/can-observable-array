@@ -76,7 +76,7 @@ const listInstance = new MyArray(["a", "b"]);
 listInstance.on( "length", function( event, newLength, oldLength ) { /* ... */ } );
 ```
 
-`ObservableArray` [class fields](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Class_fields) are observables, example:
+`ObservableArray` [class fields](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Class_fields) are also observables, example:
 
 
  ```js
