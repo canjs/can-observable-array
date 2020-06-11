@@ -76,6 +76,26 @@ const listInstance = new MyArray(["a", "b"]);
 listInstance.on( "length", function( event, newLength, oldLength ) { /* ... */ } );
 ```
 
+`ObservableArray` [class fields](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Class_fields) are also observables, example:
+
+
+ ```js
+import { ObservableArray } from "can/everything";
+
+class MyArray extends ObservableArray {
+  prop = ['foo', 'bar'];
+}
+
+const myInstance = new MyArray();
+
+myInstance.on( "prop", ( event, newVal, oldVal ) => {
+	console.log( newVal ); //-> ['baz']
+	console.log( oldVal ); //-> ['foo', 'bar']
+});
+
+myInstance.prop = ['baz'];
+```
+
 
 ## Mixed-in type methods and properties
 

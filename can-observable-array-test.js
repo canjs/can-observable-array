@@ -5,4 +5,5 @@ QUnit.module("can-observable-array", function() {
 	require("./test/items-test")();
 	require("./test/propdefaults-test")();
 	require("./test/steal-import-test");
+	require('./test/class-field-test#?can-observable-array/class-fields-support');
 });
