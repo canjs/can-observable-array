@@ -50,32 +50,6 @@ QUnit.test('Throws on class field property named items', function (assert) {
 
 });
 
-QUnit.test('handle descriptor getter', function(assert) {
-	assert.expect(4);
-
-	const foo = new ObservableArray();
-
-	let _bar = "Hello";
-	Object.defineProperty(foo, "bar", {
-		get() {
-			return _bar;
-		},
-		set(val) {
-			_bar = val;
-		}
-	});
-	
-	assert.equal(foo.bar, 'Hello');
-
-	foo.on('bar', function (ev, newVal, oldVal) {
-		assert.equal(oldVal, 'Hello', 'Old value is correct');
-		assert.equal(newVal, 'Hola', 'Value is updated');
-		assert.ok(ev, 'The class field is observable');
-	});
-
-	foo.bar = 'Hola';
-});
-
 QUnit.test('set should work', function(assert) {
 	class Foo extends ObservableArray{}
 	const foo = new Foo();
