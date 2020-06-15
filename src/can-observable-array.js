@@ -59,8 +59,15 @@ class ObservableArray extends MixedInArray {
 				const props = target.constructor.props;
 				let value = descriptor.value;
 
-				if (!value && typeof descriptor.get === 'function') {
-					value = descriptor.get();
+				if (!value) {
+					if (typeof descriptor.get === 'function') {
+						// Try to read the value with a getter 
+						try {
+							value = descriptor.get();
+						} catch (error) {
+							return mixins.expando(target, prop, value);
+						}
+					}
 				}
 
 				if (value) {

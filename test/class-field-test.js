@@ -75,3 +75,10 @@ QUnit.test('handle descriptor getter', function(assert) {
 
 	foo.bar = 'Hola';
 });
+
+QUnit.test('set should work', function(assert) {
+	class Foo extends ObservableArray{}
+	const foo = new Foo();
+	foo.set("count", 3);
+	assert.equal(foo.count, 3);
+});
