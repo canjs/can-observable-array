@@ -61,10 +61,9 @@ class ObservableArray extends MixedInArray {
 
 				if (!value) {
 					if (typeof descriptor.get === 'function') {
-						// Try to read the value with a getter 
-						try {
-							value = descriptor.get();
-						} catch (error) {
+						// Try to read the value with a getter
+						value = descriptor.get.call(target);
+						if (!value) {
 							return mixins.expando(target, prop, value);
 						}
 					}
