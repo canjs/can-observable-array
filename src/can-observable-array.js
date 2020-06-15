@@ -21,6 +21,7 @@ const localOnPatchesSymbol = "can.patches";
 const onKeyValueSymbol = Symbol.for("can.onKeyValue");
 const offKeyValueSymbol = Symbol.for("can.offKeyValue");
 const metaSymbol = Symbol.for("can.meta");
+const inSetupSymbol = Symbol.for("can.initializing")
 
 function isListLike(items) {
 	return canReflect.isListLike(items) && typeof items !== "string";
@@ -55,28 +56,25 @@ class ObservableArray extends MixedInArray {
 				if ('items' === prop) {
 					throw new Error('ObservableArray does not support a class field named items. Try using a different name or using static items');
 				}
-				
-				const props = target.constructor.props;
-				let value = descriptor.value;
 
-				if (!value) {
-					if (typeof descriptor.get === 'function') {
-						// Try to read the value with a getter
+				// Handle class fields
+				if (!target[inSetupSymbol]) {
+					let value = descriptor.value;
+					if (!value && typeof descriptor.get === 'function') {
 						value = descriptor.get.call(target);
-						if (!value) {
-							return mixins.expando(target, prop, value);
+					}
+	
+					if (value) {
+						const props = target.constructor.props;
+						if (props && props[prop]) {
+							obj[prop] = value;
+							return true;
 						}
+						// Make the property observable
+						return mixins.expando(target, prop, value);
 					}
 				}
-
-				if (value) {
-					if (props && props[prop]) {
-						obj[prop] = value;
-						return true;
-					}
-					// Make the property observable
-					return mixins.expando(target, prop, value);
-				}
+				return Reflect.defineProperty(target, prop, descriptor);
 			}
 		});
 	}
