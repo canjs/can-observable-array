@@ -58,7 +58,7 @@ class ObservableArray extends MixedInArray {
 				}
 
 				// Handle class fields
-				if (target[inSetupSymbol] !== false) {
+				if (target[inSetupSymbol] === false) {
 					let value = descriptor.value;
 					// Make the property observable
 					return mixins.expando(target, prop, value);
