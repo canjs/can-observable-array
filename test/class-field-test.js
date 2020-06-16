@@ -50,28 +50,43 @@ QUnit.test('Throws on class field property named items', function (assert) {
 
 });
 
-QUnit.test('handle descriptor getter', function(assert) {
-	assert.expect(4);
+QUnit.test('set should work', function(assert) {
+	class Foo extends ObservableArray{}
+	const foo = new Foo();
+	foo.set("count", 3);
+	assert.equal(foo.count, 3);
+});
 
-	const foo = new ObservableArray();
+QUnit.test('Class fields should not overwrite static props', function (assert) {
+	const done = assert.async();
+	assert.expect(5);
 
-	let _bar = "Hello";
-	Object.defineProperty(foo, "bar", {
-		get() {
-			return _bar;
-		},
-		set(val) {
-			_bar = val;
+	class MyList extends ObservableArray{
+		/* jshint ignore:start */
+		greetings = 'Hello';
+		/* jshint ignore:end */
+		static get props() {
+			return {
+				greetings: 'Bonjour'
+			};
 		}
-	});
-	
-	assert.equal(foo.bar, 'Hello');
+	}
 
-	foo.on('bar', function (ev, newVal, oldVal) {
+	const aList = new MyList();
+
+	assert.equal(aList.greetings, 'Hello', 'Default valus is correct');
+	aList.on('greetings', function (ev, newVal, oldVal) {
 		assert.equal(oldVal, 'Hello', 'Old value is correct');
 		assert.equal(newVal, 'Hola', 'Value is updated');
 		assert.ok(ev, 'The class field is observable');
+		done();
 	});
 
-	foo.bar = 'Hola';
+	aList.greetings = 'Hola';
+
+	try {
+		aList.greetings = {foo: 'bar'};
+	} catch (error) {
+		assert.ok(error, 'Error thrown on the wrong type');
+	}
 });
