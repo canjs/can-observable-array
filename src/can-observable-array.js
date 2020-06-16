@@ -55,16 +55,17 @@ class ObservableArray extends MixedInArray {
 				if ('items' === prop) {
 					throw new Error('ObservableArray does not support a class field named items. Try using a different name or using static items');
 				}
+				
+				let value = descriptor.value;
 
 				// Don't overwrite static props
 				// that share the same name with a class field
 				const props = target.constructor.props;
 				if (props && props[prop]) {
-					instance[prop] = descriptor.value;
+					instance[prop] = value;
 					return true;
 				}
 
-				let value = descriptor.value;
 				return mixins.expando(target, prop, value);
 			}
 		});
