@@ -56,3 +56,37 @@ QUnit.test('set should work', function(assert) {
 	foo.set("count", 3);
 	assert.equal(foo.count, 3);
 });
+
+QUnit.test('Class fields should not overwrite static props', function (assert) {
+	const done = assert.async();
+	assert.expect(5);
+
+	class MyList extends ObservableArray{
+		/* jshint ignore:start */
+		greetings = 'Hello';
+		/* jshint ignore:end */
+		static get props() {
+			return {
+				greetings: 'Bonjour'
+			};
+		}
+	}
+
+	const aList = new MyList();
+
+	assert.equal(aList.greetings, 'Hello', 'Default valus is correct');
+	aList.on('greetings', function (ev, newVal, oldVal) {
+		assert.equal(oldVal, 'Hello', 'Old value is correct');
+		assert.equal(newVal, 'Hola', 'Value is updated');
+		assert.ok(ev, 'The class field is observable');
+		done();
+	});
+
+	aList.greetings = 'Hola';
+
+	try {
+		aList.greetings = {foo: 'bar'};
+	} catch (error) {
+		assert.ok(error, 'Error thrown on the wrong type');
+	}
+});

@@ -21,7 +21,6 @@ const localOnPatchesSymbol = "can.patches";
 const onKeyValueSymbol = Symbol.for("can.onKeyValue");
 const offKeyValueSymbol = Symbol.for("can.offKeyValue");
 const metaSymbol = Symbol.for("can.meta");
-const inSetupSymbol = Symbol.for("can.initializing");
 
 function isListLike(items) {
 	return canReflect.isListLike(items) && typeof items !== "string";
@@ -48,7 +47,7 @@ class ObservableArray extends MixedInArray {
 		for(let i = 0, len = items && items.length; i < len; i++) {
 			this[i] = convertItem(new.target, items[i]);
 		}
-		
+		const instance = this;
 		// Define class fields observables 
 		//and return the proxy
 		return new Proxy(this, {
@@ -57,14 +56,16 @@ class ObservableArray extends MixedInArray {
 					throw new Error('ObservableArray does not support a class field named items. Try using a different name or using static items');
 				}
 
-				// Handle class fields
-				if (target[inSetupSymbol] === false) {
-					let value = descriptor.value;
-					// Make the property observable
-					return mixins.expando(target, prop, value);
+				// Don't overwrite static props
+				// that share the same name with a class field
+				const props = target.constructor.props;
+				if (props && props[prop]) {
+					instance[prop] = descriptor.value;
+					return true;
 				}
-				// fall through as if there were not a `defineProperty` trap
-				return Reflect.defineProperty(target, prop, descriptor);
+
+				let value = descriptor.value;
+				return mixins.expando(target, prop, value);
 			}
 		});
 	}
