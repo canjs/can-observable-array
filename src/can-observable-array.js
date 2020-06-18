@@ -47,7 +47,7 @@ class ObservableArray extends MixedInArray {
 		for(let i = 0, len = items && items.length; i < len; i++) {
 			this[i] = convertItem(new.target, items[i]);
 		}
-		const instance = this;
+		
 		// Define class fields observables 
 		//and return the proxy
 		return new Proxy(this, {
@@ -55,17 +55,26 @@ class ObservableArray extends MixedInArray {
 				if ('items' === prop) {
 					throw new Error('ObservableArray does not support a class field named items. Try using a different name or using static items');
 				}
+
+				// do not create expando properties for special keys set by can-observable-mixin
+				if (prop === '_instanceDefinitions') {
+					return Reflect.defineProperty(target, prop, descriptor);
+				}
 				
 				let value = descriptor.value;
 
-				// Don't overwrite static props
-				// that share the same name with a class field
+				// do not create expando properties for properties that are described
+				// by `static props` or `static propertyDefaults`
 				const props = target.constructor.props;
-				if (props && props[prop]) {
-					instance[prop] = value;
-					return true;
+				if (props && props[prop] || target.constructor.propertyDefaults) {
+					if (value) {
+						target.set(prop, value);
+						return true;
+					}
+					return Reflect.defineProperty(target, prop, descriptor);
 				}
 
+				// create expandos to make all other properties observable
 				return mixins.expando(target, prop, value);
 			}
 		});
