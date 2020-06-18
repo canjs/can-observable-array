@@ -1,4 +1,5 @@
 const ObservableArray = require("../src/can-observable-array");
+const type = require('can-type');
 const QUnit = require("steal-qunit");
 
 QUnit.module('can-observable-array-class-fields');
@@ -89,4 +90,58 @@ QUnit.test('Class fields should not overwrite static props', function (assert) {
 	} catch (error) {
 		assert.ok(error, 'Error thrown on the wrong type');
 	}
+});
+
+QUnit.test('propertyDefaults for class fields', function(assert) {
+	class MyArray extends ObservableArray {
+		/* jshint ignore:start */
+		foo = 4;
+		/* jshint ignore:end */
+
+		static get propertyDefaults() {
+			return type.maybeConvert(String);
+		}
+
+		static get props() {
+			return {
+				bar: 100
+			};
+		}
+	}
+
+	const anArray = new MyArray();
+	assert.strictEqual(anArray.foo, '4');
+	assert.strictEqual(anArray.bar, '100');
+
+	anArray.on('foo', (ev, newVal, oldVal) => {
+		assert.ok(ev, 'is obervable');
+		assert.strictEqual(newVal, '90');
+		assert.strictEqual(oldVal, '4');
+	});
+
+	anArray.on('bar', (ev, newVal, oldVal) => {
+		assert.ok(ev, 'static props are still obervable');
+		assert.strictEqual(newVal, '190');
+		assert.strictEqual(oldVal, '100');
+	});
+
+	anArray.set('foo', 90);
+	anArray.set('bar', 190);
+});
+
+QUnit.test('setting property on propertyDefaults', function(assert) {
+	class MyArray extends ObservableArray {
+		static get propertyDefaults () {
+			return type.maybeConvert(String);
+		}
+	}
+
+	const anArray = new MyArray();
+
+	anArray.on('bar', (ev, newVal) => {
+		assert.ok(ev, 'static props are still obervable');
+		assert.strictEqual(newVal, '190');
+	});
+
+	anArray.set('bar', 190);
 });
