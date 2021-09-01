@@ -41,11 +41,11 @@ class ObservableArray extends MixedInArray {
 			super();
 		}
 
-		mixins.finalizeClass(new.target);
+		mixins.finalizeClass(this.constructor);
 		mixins.initialize(this, props || {});
 		
 		for(let i = 0, len = items && items.length; i < len; i++) {
-			this[i] = convertItem(new.target, items[i]);
+			this[i] = convertItem(this.constructor, items[i]);
 		}
 		
 		// Define class fields observables 
