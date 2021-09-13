@@ -41,14 +41,14 @@ class ObservableArray extends MixedInArray {
 			super();
 		}
 
-		mixins.finalizeClass(new.target);
+		mixins.finalizeClass(this.constructor);
 		mixins.initialize(this, props || {});
-		
+
 		for(let i = 0, len = items && items.length; i < len; i++) {
-			this[i] = convertItem(new.target, items[i]);
+			this[i] = convertItem(this.constructor, items[i]);
 		}
-		
-		// Define class fields observables 
+
+		// Define class fields observables
 		//and return the proxy
 		return new Proxy(this, {
 			defineProperty(target, prop, descriptor) {
@@ -60,7 +60,7 @@ class ObservableArray extends MixedInArray {
 				if (prop === '_instanceDefinitions') {
 					return Reflect.defineProperty(target, prop, descriptor);
 				}
-				
+
 				let value = descriptor.value;
 
 				// do not create expando properties for properties that are described
